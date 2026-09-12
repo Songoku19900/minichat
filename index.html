@@ -572,103 +572,200 @@ id("formulairePublic").addEventListener("submit", async event => {
 
 /* MESSAGES PRIVÉS */
 
-id("ouvrirConversation").addEventListener("click", async () => {
+let destinataireActuel = "";
+
+/* Trouver une conversation existante dans les deux sens */
+async function trouverConversation(destinataire) {
+    const recherche1 = await base
+        .from("conversations_privees")
+        .select("id, utilisateur1, utilisateur2")
+        .eq("utilisateur1", pseudo)
+        .eq("utilisateur2", destinataire)
+        .limit(1);
+
+    if (recherche1.error) {
+        throw recherche1.error;
+    }
+
+    if (recherche1.data.length > 0) {
+        return recherche1.data[0];
+    }
+
+    const recherche2 = await base
+        .from("conversations_privees")
+        .select("id, utilisateur1, utilisateur2")
+        .eq("utilisateur1", destinataire)
+        .eq("utilisateur2", pseudo)
+        .limit(1);
+
+    if (recherche2.error) {
+        throw recherche2.error;
+    }
+
+    if (recherche2.data.length > 0) {
+        return recherche2.data[0];
+    }
+
+    return null;
+}
+
+/* Ouvrir une conversation */
+async function ouvrirLaConversation() {
     const destinataire = id("pseudoDestinataire").value.trim();
 
-    if (!destinataire || destinataire === pseudo) {
+    afficherErreur("erreurPrive", "");
+
+    if (!destinataire) {
         afficherErreur(
             "erreurPrive",
-            "Entre le pseudo d'une autre personne."
+            "Entre le pseudo du destinataire."
         );
         return;
     }
 
-    const recherche = await base
-        .from("conversations_privees")
-        .select("id,utilisateur1,utilisateur2")
-        .or(
-            "and(utilisateur1.eq." + pseudo +
-            ",utilisateur2.eq." + destinataire +
-            "),and(utilisateur1.eq." + destinataire +
-            ",utilisateur2.eq." + pseudo + ")"
+    if (destinataire.toLowerCase() === pseudo.toLowerCase()) {
+        afficherErreur(
+            "erreurPrive",
+            "Tu ne peux pas discuter avec toi-même."
         );
-
-    if (recherche.error) {
-        afficherErreur("erreurPrive", recherche.error.message);
         return;
     }
 
-    if (recherche.data.length > 0) {
-        conversationActuelle = recherche.data[0].id;
-    } else {
-        const creation = await base
-            .from("conversations_privees")
-            .insert({
-                utilisateur1: pseudo,
-                utilisateur2: destinataire
-            })
-            .select()
-            .single();
+    try {
+        let conversation = await trouverConversation(destinataire);
 
-        if (creation.error) {
-            afficherErreur("erreurPrive", creation.error.message);
-            return;
+        /* Si la conversation n'existe pas, on la crée */
+        if (!conversation) {
+            const creation = await base
+                .from("conversations_privees")
+                .insert({
+                    utilisateur1: pseudo,
+                    utilisateur2: destinataire
+                })
+                .select("id, utilisateur1, utilisateur2")
+                .single();
+
+            if (creation.error) {
+                throw creation.error;
+            }
+
+            conversation = creation.data;
         }
 
-        conversationActuelle = creation.data.id;
+        conversationActuelle = conversation.id;
+        destinataireActuel = destinataire;
+
+        id("informationPrivee").textContent =
+            "Conversation avec : " + destinataire;
+
+        await chargerMessagesPrives();
+
+    } catch (erreur) {
+        afficherErreur(
+            "erreurPrive",
+            "Erreur : " + erreur.message
+        );
     }
+}
 
-    id("informationPrivee").textContent =
-        "Conversation avec : " + destinataire;
+/* Bouton Ouvrir */
+id("ouvrirConversation").addEventListener(
+    "click",
+    ouvrirLaConversation
+);
 
-    chargerMessagesPrives();
-});
+/* Appuyer sur Entrée dans le champ du destinataire */
+id("pseudoDestinataire").addEventListener(
+    "keydown",
+    event => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            ouvrirLaConversation();
+        }
+    }
+);
 
+/* Charger les messages de la conversation */
 async function chargerMessagesPrives() {
-    if (!conversationActuelle) return;
-
-    id("messagesPrives").innerHTML = "";
+    if (!conversationActuelle) {
+        return;
+    }
 
     const resultat = await base
         .from("messages_prives")
-        .select("pseudo,text,created_at")
+        .select("pseudo, text, created_at")
         .eq("conversation_id", conversationActuelle)
-        .order("created_at", { ascending: true });
+        .order("created_at", {
+            ascending: true
+        });
 
     if (resultat.error) {
-        afficherErreur("erreurPrive", resultat.error.message);
+        afficherErreur(
+            "erreurPrive",
+            resultat.error.message
+        );
         return;
     }
+
+    id("messagesPrives").innerHTML = "";
 
     resultat.data.forEach(message => {
         afficherMessage("messagesPrives", message);
     });
+
+    id("messagesPrives").scrollTop =
+        id("messagesPrives").scrollHeight;
 }
 
-id("formulairePrive").addEventListener("submit", async event => {
-    event.preventDefault();
+/* Envoyer un message privé */
+id("formulairePrive").addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
 
-    const texte = id("textePrive").value.trim();
+        const texte = id("textePrive").value.trim();
 
-    if (!texte || !conversationActuelle) return;
+        if (!texte) {
+            return;
+        }
 
-    const resultat = await base
-        .from("messages_prives")
-        .insert({
-            conversation_id: conversationActuelle,
-            pseudo: pseudo,
-            text: texte
-        });
+        if (!conversationActuelle) {
+            afficherErreur(
+                "erreurPrive",
+                "Ouvre d'abord une conversation."
+            );
+            return;
+        }
 
-    if (resultat.error) {
-        afficherErreur("erreurPrive", resultat.error.message);
-        return;
+        const resultat = await base
+            .from("messages_prives")
+            .insert({
+                conversation_id: conversationActuelle,
+                pseudo: pseudo,
+                text: texte
+            });
+
+        if (resultat.error) {
+            afficherErreur(
+                "erreurPrive",
+                resultat.error.message
+            );
+            return;
+        }
+
+        id("textePrive").value = "";
+        afficherErreur("erreurPrive", "");
+
+        await chargerMessagesPrives();
     }
+);
 
-    id("textePrive").value = "";
-
-    chargerMessagesPrives();
-});
+/* Actualiser automatiquement les messages toutes les 2 secondes */
+setInterval(() => {
+    if (conversationActuelle) {
+        chargerMessagesPrives();
+    }
+}, 2000);
 
 /* GROUPES */
 
