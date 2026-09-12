@@ -1003,6 +1003,14 @@ id("changerPseudo").addEventListener("click", () => {
     location.reload();
 });
 
+id("boutonConnexion").addEventListener("click", connecterPseudo);
+
+id("pseudoInput").addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        connecterPseudo();
+    }
+});
+
 /* DÉMARRAGE */
 
 if (pseudo) {
