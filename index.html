@@ -395,7 +395,7 @@ const SUPABASE_URL =
     "https://yntyarldepwjlbbeobja.supabase.co";
 
 const SUPABASE_KEY =
-       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InludHlhcmxkZXB3amxiYmVvYmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMjA4MDYsImV4cCI6MjEwNDc5NjgwNn0.hfE2Vb3aYqI5TAZ7jc3fxXXOecmIC_nud98NECGw2u0";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InludHlhcmxkZXB3amxiYmVvYmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMjA4MDYsImV4cCI6MjEwNDc5NjgwNn0.hfE2Vb3aYqI5TAZ7jc3fxXXOecmIC_nud98NECGw2u0";
 
 const base = supabase.createClient(
     SUPABASE_URL,
@@ -414,6 +414,14 @@ function id(nom) {
 
 function afficherErreur(element, message = "") {
     id(element).textContent = message;
+}
+
+function actualiserProfil() {
+    id("utilisateurConnecte").textContent =
+        "Connecté en tant que : " + pseudo;
+
+    id("texteProfil").textContent =
+        "Ton pseudo actuel est : " + pseudo;
 }
 
 /* NAVIGATION */
