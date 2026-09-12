@@ -1,20 +1,816 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MiniChat</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#eef2ff;color:#1f2937}.app{width:min(900px,100%);height:90vh;margin:5vh auto;background:white;border-radius:18px;box-shadow:0 10px 35px #0002;overflow:hidden;display:flex;flex-direction:column}header{background:#4f46e5;color:white;padding:20px}header h1{margin:0}header p{margin:7px 0 0}#connexion{padding:20px;display:flex;gap:10px;flex-wrap:wrap}input,button{font:inherit;border-radius:10px;padding:12px}input{flex:1;min-width:180px;border:1px solid #d1d5db}button{border:0;background:#4f46e5;color:white;cursor:pointer}button:hover{background:#3730a3}#chat{display:none;flex:1;min-height:0;flex-direction:column}#messages{flex:1;overflow-y:auto;padding:20px;background:#f8fafc}.message{max-width:80%;margin:9px 0;padding:10px 13px;border:1px solid #e5e7eb;border-radius:12px;background:white;overflow-wrap:anywhere}.message.moi{margin-left:auto;background:#e0e7ff}.message strong{color:#4f46e5}#statut{padding:10px 20px;color:#64748b;font-size:14px}#formulaire{display:flex;gap:10px;padding:15px;border-top:1px solid #ddd}#texte{min-width:0}#erreur{color:#b91c1c;padding:0 20px 15px;white-space:pre-wrap}@media(max-width:600px){.app{margin:0;height:100vh;border-radius:0}.message{max-width:92%}}
-</style></head>
-<body><div class="app"><header><h1>💬 MiniChat</h1><p>Discute avec tes amis en ligne</p></header><section id="connexion"><input id="pseudo" maxlength="25" placeholder="Ton pseudo"><button id="rejoindre">Rejoindre le chat</button></section><section id="chat"><div id="messages"></div><div id="statut"></div><div id="erreur"></div><form id="formulaire"><input id="texte" maxlength="500" placeholder="Écris ton message..." autocomplete="off"><button>Envoyer</button></form></section></div>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef2ff;
+    color: #1e293b;
+}
+
+.application {
+    display: flex;
+    max-width: 1150px;
+    height: 92vh;
+    margin: 4vh auto;
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 35px #0002;
+}
+
+.menu {
+    width: 240px;
+    background: #312e81;
+    color: white;
+    padding: 20px;
+}
+
+.menu h1 {
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.menu button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: #4f46e5;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menu button:hover,
+.menu button.actif {
+    background: #818cf8;
+}
+
+.contenu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+header {
+    background: #4f46e5;
+    color: white;
+    padding: 18px;
+}
+
+header h2 {
+    margin: 0 0 5px;
+}
+
+.page {
+    display: none;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.page.actif {
+    display: flex;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.message {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px;
+    margin: 8px 0;
+    max-width: 85%;
+    overflow-wrap: anywhere;
+}
+
+.message.moi {
+    margin-left: auto;
+    background: #e0e7ff;
+}
+
+.message small {
+    display: block;
+    color: #64748b;
+    margin-bottom: 5px;
+}
+
+form,
+.ligne {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    font: inherit;
+}
+
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 9px;
+    background: #4f46e5;
+    color: white;
+    cursor: pointer;
+    font: inherit;
+}
+
+button:hover {
+    filter: brightness(0.95);
+}
+
+.bouton-secondaire {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.information {
+    background: #fff7ed;
+    color: #9a3412;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.erreur {
+    color: #b91c1c;
+    margin-top: 8px;
+    white-space: pre-wrap;
+}
+
+.liste-groupes {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.groupe-bouton {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.groupe-bouton.selectionne {
+    background: #a5b4fc;
+}
+
+#connexion {
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 10;
+}
+
+.boite-connexion {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    width: 100%;
+    max-width: 410px;
+}
+
+@media (max-width: 650px) {
+    .application {
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .menu {
+        width: 70px;
+        padding: 8px;
+    }
+
+    .menu h1 {
+        font-size: 0;
+    }
+
+    .menu h1::after {
+        content: "💬";
+        font-size: 25px;
+    }
+
+    .menu button {
+        font-size: 0;
+        text-align: center;
+        padding: 14px 4px;
+    }
+
+    .menu button::first-letter {
+        font-size: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- CONNEXION -->
+<div id="connexion">
+    <div class="boite-connexion">
+        <h2>💬 Bienvenue sur MiniChat</h2>
+        <p>Choisis ton pseudo pour commencer.</p>
+
+        <input
+            id="pseudoInput"
+            maxlength="25"
+            placeholder="Ton pseudo"
+            style="width:100%"
+        >
+
+        <button id="boutonConnexion" style="width:100%;margin-top:10px">
+            Entrer dans MiniChat
+        </button>
+
+        <div id="erreurConnexion" class="erreur"></div>
+    </div>
+</div>
+
+<div class="application">
+
+    <!-- MENU -->
+    <aside class="menu">
+        <h1>MiniChat</h1>
+
+        <button class="navigation actif" data-page="public">
+            🌍 Discussion publique
+        </button>
+
+        <button class="navigation" data-page="prive">
+            🔒 Messages privés
+        </button>
+
+        <button class="navigation" data-page="groupes">
+            👥 Groupes
+        </button>
+
+        <button class="navigation" data-page="profil">
+            ⚙️ Mon profil
+        </button>
+    </aside>
+
+    <main class="contenu">
+
+        <header>
+            <h2 id="titrePage">Discussion publique</h2>
+            <div id="utilisateurConnecte"></div>
+        </header>
+
+        <!-- PAGE PUBLIQUE -->
+        <section id="public" class="page actif">
+            <div id="messagesPublics" class="messages"></div>
+
+            <form id="formulairePublic">
+                <input
+                    id="textePublic"
+                    maxlength="500"
+                    placeholder="Écris un message public..."
+                >
+                <button>Envoyer</button>
+            </form>
+
+            <div id="erreurPublic" class="erreur"></div>
+        </section>
+
+        <!-- PAGE PRIVÉE -->
+        <section id="prive" class="page">
+
+            <div class="ligne">
+                <input
+                    id="pseudoDestinataire"
+                    maxlength="25"
+                    placeholder="Pseudo du destinataire"
+                >
+
+                <button id="ouvrirConversation">
+                    Ouvrir
+                </button>
+            </div>
+
+            <div id="informationPrivee" class="information">
+                Choisis un pseudo pour ouvrir une conversation privée.
+            </div>
+
+            <div id="messagesPrives" class="messages"></div>
+
+            <form id="formulairePrive">
+                <input
+                    id="textePrive"
+                    maxlength="500"
+                    placeholder="Écris un message privé..."
+                >
+                <button>Envoyer</button>
+            </form>
+
+            <div id="erreurPrive" class="erreur"></div>
+        </section>
+
+        <!-- PAGE GROUPES -->
+        <section id="groupes" class="page">
+
+            <div class="ligne">
+                <input
+                    id="nomGroupe"
+                    maxlength="50"
+                    placeholder="Nom du nouveau groupe"
+                >
+
+                <button id="creerGroupe">
+                    Créer
+                </button>
+            </div>
+
+            <div id="listeGroupes" class="liste-groupes"></div>
+
+            <div id="informationGroupe" class="information">
+                Sélectionne un groupe.
+            </div>
+
+            <div id="messagesGroupes" class="messages"></div>
+
+            <form id="formulaireGroupe">
+                <input
+                    id="texteGroupe"
+                    maxlength="500"
+                    placeholder="Écris dans le groupe..."
+                >
+                <button>Envoyer</button>
+            </form>
+
+            <div id="erreurGroupe" class="erreur"></div>
+        </section>
+
+        <!-- PAGE PROFIL -->
+        <section id="profil" class="page">
+            <h3>Mon profil</h3>
+            <p id="texteProfil"></p>
+            <p>Ton pseudo est enregistré dans ce navigateur.</p>
+
+            <button id="changerPseudo" class="bouton-secondaire">
+                Changer de pseudo
+            </button>
+        </section>
+
+    </main>
+</div>
+
 <script>
-const SUPABASE_URL="https://yntyarldepwjlbbeobja.supabase.co";
-const SUPABASE_KEY="sb_publishable__x0aufIhmmpaAj_FdTyc-w_RPgErGE9";
-const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let pseudoActuel="";
-const zone=document.getElementById("messages"),erreur=document.getElementById("erreur");
-function fail(t){erreur.textContent=t;console.error(t)}
-function afficher(m){const d=document.createElement("div");d.className="message"+(m.pseudo===pseudoActuel?" moi":"");const n=document.createElement("strong"),t=document.createElement("span");n.textContent=m.pseudo+" : ";t.textContent=m.text;d.append(n,t);zone.appendChild(d);zone.scrollTop=zone.scrollHeight}
-async function rejoindre(){pseudoActuel=document.getElementById("pseudo").value.trim();if(!pseudoActuel)return alert("Écris un pseudo.");document.getElementById("connexion").style.display="none";document.getElementById("chat").style.display="flex";document.getElementById("statut").textContent="Connecté en tant que "+pseudoActuel;const r=await client.from("messages").select("id,created_at,pseudo,text").order("created_at",{ascending:true}).limit(100);if(r.error)return fail("Impossible de charger les messages. Vérifie les règles RLS dans Supabase.");r.data.forEach(afficher);client.channel("messages-en-direct").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},p=>afficher(p.new)).subscribe()}
-document.getElementById("rejoindre").onclick=rejoindre;document.getElementById("formulaire").onsubmit=async e=>{e.preventDefault();const c=document.getElementById("texte"),text=c.value.trim();if(!text||!pseudoActuel)return;const r=await client.from("messages").insert({pseudo:pseudoActuel,text});if(r.error)fail("Message non envoyé. Vérifie la règle INSERT dans Supabase.");else c.value=""};
-</script></body></html>
+/* CONFIGURATION SUPABASE */
+
+const SUPABASE_URL =
+    "https://yntyarldepwjlbbeobja.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable__x0aufIhmmpaAj_FdTyc-w_RPgErGE9";
+
+const base = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+/* VARIABLES */
+
+let pseudo = localStorage.getItem("minichat_pseudo") || "";
+let conversationActuelle = null;
+let groupeActuel = null;
+
+function id(nom) {
+    return document.getElementById(nom);
+}
+
+function afficherErreur(element, message = "") {
+    id(element).textContent = message;
+}
+
+/* NAVIGATION */
+
+document.querySelectorAll(".navigation").forEach(bouton => {
+    bouton.addEventListener("click", () => {
+        const page = bouton.dataset.page;
+
+        document.querySelectorAll(".page").forEach(section => {
+            section.classList.toggle("actif", section.id === page);
+        });
+
+        document.querySelectorAll(".navigation").forEach(b => {
+            b.classList.toggle("actif", b === bouton);
+        });
+
+        const titres = {
+            public: "Discussion publique",
+            prive: "Messages privés",
+            groupes: "Groupes",
+            profil: "Mon profil"
+        };
+
+        id("titrePage").textContent = titres[page];
+
+        if (page === "public") chargerMessagesPublics();
+        if (page === "groupes") chargerGroupes();
+    });
+});
+
+/* AFFICHAGE DES MESSAGES */
+
+function afficherMessage(element, message) {
+    const bloc = document.createElement("div");
+
+    bloc.className = "message";
+
+    if (message.pseudo === pseudo) {
+        bloc.classList.add("moi");
+    }
+
+    const auteur = document.createElement("small");
+    auteur.textContent =
+        message.pseudo +
+        " • " +
+        new Date(message.created_at).toLocaleString("fr-FR");
+
+    const texte = document.createElement("div");
+    texte.textContent = message.text;
+
+    bloc.appendChild(auteur);
+    bloc.appendChild(texte);
+
+    id(element).appendChild(bloc);
+}
+
+/* UTILISATEUR */
+
+async function connecterPseudo() {
+    const nouveauPseudo = id("pseudoInput").value.trim();
+
+    if (!nouveauPseudo) {
+        afficherErreur("erreurConnexion", "Entre un pseudo.");
+        return;
+    }
+
+    const resultat = await base
+        .from("utilisateurs")
+        .insert({
+            pseudo: nouveauPseudo
+        });
+
+    if (resultat.error && resultat.error.code !== "23505") {
+        afficherErreur(
+            "erreurConnexion",
+            "Impossible d'enregistrer le pseudo. Vérifie les règles RLS."
+        );
+        return;
+    }
+
+    pseudo = nouveauPseudo;
+
+    localStorage.setItem("minichat_pseudo", pseudo);
+
+    id("connexion").style.display = "none";
+
+    actualiserProfil();
+
+    chargerMessagesPublics();
+    chargerGroupes();
+}
+
+function actualiserProfil() {
+    id("utilisateurConnecte").textContent =
+        "Connecté : " + pseudo;
+
+    id("texteProfil").textContent =
+        "Pseudo actuel : " + pseudo;
+}
+
+id("boutonConnexion").addEventListener("click", connecterPseudo);
+
+id("pseudoInput").addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        connecterPseudo();
+    }
+});
+
+/* DISCUSSION PUBLIQUE */
+
+async function chargerMessagesPublics() {
+    id("messagesPublics").innerHTML = "";
+
+    const resultat = await base
+        .from("messages")
+        .select("pseudo,text,created_at")
+        .order("created_at", { ascending: true })
+        .limit(100);
+
+    if (resultat.error) {
+        afficherErreur("erreurPublic", resultat.error.message);
+        return;
+    }
+
+    resultat.data.forEach(message => {
+        afficherMessage("messagesPublics", message);
+    });
+
+    id("messagesPublics").scrollTop =
+        id("messagesPublics").scrollHeight;
+}
+
+id("formulairePublic").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const texte = id("textePublic").value.trim();
+
+    if (!texte) return;
+
+    const resultat = await base
+        .from("messages")
+        .insert({
+            pseudo: pseudo,
+            text: texte
+        });
+
+    if (resultat.error) {
+        afficherErreur("erreurPublic", resultat.error.message);
+        return;
+    }
+
+    id("textePublic").value = "";
+
+    chargerMessagesPublics();
+});
+
+/* MESSAGES PRIVÉS */
+
+id("ouvrirConversation").addEventListener("click", async () => {
+    const destinataire = id("pseudoDestinataire").value.trim();
+
+    if (!destinataire || destinataire === pseudo) {
+        afficherErreur(
+            "erreurPrive",
+            "Entre le pseudo d'une autre personne."
+        );
+        return;
+    }
+
+    const recherche = await base
+        .from("conversations_privees")
+        .select("id,utilisateur1,utilisateur2")
+        .or(
+            "and(utilisateur1.eq." + pseudo +
+            ",utilisateur2.eq." + destinataire +
+            "),and(utilisateur1.eq." + destinataire +
+            ",utilisateur2.eq." + pseudo + ")"
+        );
+
+    if (recherche.error) {
+        afficherErreur("erreurPrive", recherche.error.message);
+        return;
+    }
+
+    if (recherche.data.length > 0) {
+        conversationActuelle = recherche.data[0].id;
+    } else {
+        const creation = await base
+            .from("conversations_privees")
+            .insert({
+                utilisateur1: pseudo,
+                utilisateur2: destinataire
+            })
+            .select()
+            .single();
+
+        if (creation.error) {
+            afficherErreur("erreurPrive", creation.error.message);
+            return;
+        }
+
+        conversationActuelle = creation.data.id;
+    }
+
+    id("informationPrivee").textContent =
+        "Conversation avec : " + destinataire;
+
+    chargerMessagesPrives();
+});
+
+async function chargerMessagesPrives() {
+    if (!conversationActuelle) return;
+
+    id("messagesPrives").innerHTML = "";
+
+    const resultat = await base
+        .from("messages_prives")
+        .select("pseudo,text,created_at")
+        .eq("conversation_id", conversationActuelle)
+        .order("created_at", { ascending: true });
+
+    if (resultat.error) {
+        afficherErreur("erreurPrive", resultat.error.message);
+        return;
+    }
+
+    resultat.data.forEach(message => {
+        afficherMessage("messagesPrives", message);
+    });
+}
+
+id("formulairePrive").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const texte = id("textePrive").value.trim();
+
+    if (!texte || !conversationActuelle) return;
+
+    const resultat = await base
+        .from("messages_prives")
+        .insert({
+            conversation_id: conversationActuelle,
+            pseudo: pseudo,
+            text: texte
+        });
+
+    if (resultat.error) {
+        afficherErreur("erreurPrive", resultat.error.message);
+        return;
+    }
+
+    id("textePrive").value = "";
+
+    chargerMessagesPrives();
+});
+
+/* GROUPES */
+
+async function chargerGroupes() {
+    const resultat = await base
+        .from("groupes")
+        .select("id,nom,createur")
+        .order("created_at", { ascending: true });
+
+    if (resultat.error) {
+        afficherErreur("erreurGroupe", resultat.error.message);
+        return;
+    }
+
+    id("listeGroupes").innerHTML = "";
+
+    resultat.data.forEach(groupe => {
+        const bouton = document.createElement("button");
+
+        bouton.className = "groupe-bouton";
+
+        if (groupe.id === groupeActuel) {
+            bouton.classList.add("selectionne");
+        }
+
+        bouton.textContent = "👥 " + groupe.nom;
+
+        bouton.addEventListener("click", () => {
+            choisirGroupe(groupe);
+        });
+
+        id("listeGroupes").appendChild(bouton);
+    });
+}
+
+id("creerGroupe").addEventListener("click", async () => {
+    const nom = id("nomGroupe").value.trim();
+
+    if (!nom) return;
+
+    const resultat = await base
+        .from("groupes")
+        .insert({
+            nom: nom,
+            createur: pseudo
+        })
+        .select()
+        .single();
+
+    if (resultat.error) {
+        afficherErreur("erreurGroupe", resultat.error.message);
+        return;
+    }
+
+    await base
+        .from("membres_groupes")
+        .insert({
+            groupe_id: resultat.data.id,
+            pseudo: pseudo
+        });
+
+    id("nomGroupe").value = "";
+
+    groupeActuel = resultat.data.id;
+
+    await chargerGroupes();
+    choisirGroupe(resultat.data);
+});
+
+async function choisirGroupe(groupe) {
+    groupeActuel = groupe.id;
+
+    id("informationGroupe").textContent =
+        "Groupe : " + groupe.nom +
+        " • Créateur : " + groupe.createur;
+
+    await chargerMessagesGroupes();
+    chargerGroupes();
+}
+
+async function chargerMessagesGroupes() {
+    if (!groupeActuel) return;
+
+    id("messagesGroupes").innerHTML = "";
+
+    const resultat = await base
+        .from("messages_groupes")
+        .select("pseudo,text,created_at")
+        .eq("groupe_id", groupeActuel)
+        .order("created_at", { ascending: true });
+
+    if (resultat.error) {
+        afficherErreur("erreurGroupe", resultat.error.message);
+        return;
+    }
+
+    resultat.data.forEach(message => {
+        afficherMessage("messagesGroupes", message);
+    });
+}
+
+id("formulaireGroupe").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const texte = id("texteGroupe").value.trim();
+
+    if (!texte || !groupeActuel) return;
+
+    const resultat = await base
+        .from("messages_groupes")
+        .insert({
+            groupe_id: groupeActuel,
+            pseudo: pseudo,
+            text: texte
+        });
+
+    if (resultat.error) {
+        afficherErreur("erreurGroupe", resultat.error.message);
+        return;
+    }
+
+    id("texteGroupe").value = "";
+
+    chargerMessagesGroupes();
+});
+
+/* CHANGER DE PSEUDO */
+
+id("changerPseudo").addEventListener("click", () => {
+    localStorage.removeItem("minichat_pseudo");
+    location.reload();
+});
+
+/* DÉMARRAGE */
+
+if (pseudo) {
+    id("connexion").style.display = "none";
+    actualiserProfil();
+    chargerMessagesPublics();
+    chargerGroupes();
+}
+</script>
+
+</body>
+</html>
