@@ -524,12 +524,12 @@ id("pseudoInput").addEventListener("keydown", event => {
 
 /* DISCUSSION PUBLIQUE */
 
-async function chargerMessagesPublics() {
-    id("messagesPublics").innerHTML = "";
+let dernierContenuPublic = "";
 
+async function chargerMessagesPublics() {
     const resultat = await base
         .from("messages")
-        .select("pseudo,text,created_at")
+        .select("id,pseudo,text,created_at")
         .order("created_at", { ascending: true })
         .limit(100);
 
@@ -538,37 +538,93 @@ async function chargerMessagesPublics() {
         return;
     }
 
-    resultat.data.forEach(message => {
-        afficherMessage("messagesPublics", message);
-    });
+    const signature = JSON.stringify(resultat.data);
 
-    id("messagesPublics").scrollTop =
-        id("messagesPublics").scrollHeight;
-}
-
-id("formulairePublic").addEventListener("submit", async event => {
-    event.preventDefault();
-
-    const texte = id("textePublic").value.trim();
-
-    if (!texte) return;
-
-    const resultat = await base
-        .from("messages")
-        .insert({
-            pseudo: pseudo,
-            text: texte
-        });
-
-    if (resultat.error) {
-        afficherErreur("erreurPublic", resultat.error.message);
+    // Si aucun message n'a changé, on ne reconstruit pas l'affichage
+    if (signature === dernierContenuPublic) {
         return;
     }
 
-    id("textePublic").value = "";
+    dernierContenuPublic = signature;
 
-    chargerMessagesPublics();
-});
+    const zone = id("messagesPublics");
+
+    const ancienScroll = zone.scrollTop;
+
+    const etaitEnBas =
+        zone.scrollHeight - zone.scrollTop - zone.clientHeight < 30;
+
+    const nouveauContenu =
+        document.createDocumentFragment();
+
+    resultat.data.forEach(message => {
+        const bloc = document.createElement("div");
+
+        bloc.className = "message";
+
+        if (message.pseudo === pseudo) {
+            bloc.classList.add("moi");
+        }
+
+        const auteur = document.createElement("small");
+
+        auteur.textContent =
+            message.pseudo +
+            " • " +
+            new Date(message.created_at).toLocaleString("fr-FR");
+
+        const texte = document.createElement("div");
+
+        texte.textContent = message.text;
+
+        bloc.appendChild(auteur);
+        bloc.appendChild(texte);
+
+        nouveauContenu.appendChild(bloc);
+    });
+
+    // Remplace tous les messages en une seule fois
+    zone.replaceChildren(nouveauContenu);
+
+    // Conserve la position de défilement
+    if (etaitEnBas) {
+        zone.scrollTop = zone.scrollHeight;
+    } else {
+        zone.scrollTop = ancienScroll;
+    }
+}
+
+id("formulairePublic").addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
+
+        const texte = id("textePublic").value.trim();
+
+        if (!texte) {
+            return;
+        }
+
+        const resultat = await base
+            .from("messages")
+            .insert({
+                pseudo: pseudo,
+                text: texte
+            });
+
+        if (resultat.error) {
+            afficherErreur(
+                "erreurPublic",
+                resultat.error.message
+            );
+            return;
+        }
+
+        id("textePublic").value = "";
+
+        await chargerMessagesPublics();
+    }
+);
 
 /* MESSAGES PRIVÉS */
 
@@ -937,12 +993,11 @@ if (pseudo) {
 }
 
 // Actualisation automatique de la discussion publique
-setInterval(async () => {
+setInterval(() => {
     if (pseudo !== "") {
-        await chargerMessagesPublics();
+        chargerMessagesPublics();
     }
 }, 2000);
-
 </script>
 
 </body>
