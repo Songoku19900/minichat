@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MiniChat</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#eef2ff;color:#1f2937}.app{width:min(900px,100%);height:90vh;margin:5vh auto;background:white;border-radius:18px;box-shadow:0 10px 35px #0002;overflow:hidden;display:flex;flex-direction:column}header{background:#4f46e5;color:white;padding:20px}header h1{margin:0}header p{margin:7px 0 0}#connexion{padding:20px;display:flex;gap:10px;flex-wrap:wrap}input,button{font:inherit;border-radius:10px;padding:12px}input{flex:1;min-width:180px;border:1px solid #d1d5db}button{border:0;background:#4f46e5;color:white;cursor:pointer}button:hover{background:#3730a3}#chat{display:none;flex:1;min-height:0;flex-direction:column}#messages{flex:1;overflow-y:auto;padding:20px;background:#f8fafc}.message{max-width:80%;margin:9px 0;padding:10px 13px;border:1px solid #e5e7eb;border-radius:12px;background:white;overflow-wrap:anywhere}.message.moi{margin-left:auto;background:#e0e7ff}.message strong{color:#4f46e5}#statut{padding:10px 20px;color:#64748b;font-size:14px}#formulaire{display:flex;gap:10px;padding:15px;border-top:1px solid #ddd}#texte{min-width:0}#erreur{color:#b91c1c;padding:0 20px 15px;white-space:pre-wrap}@media(max-width:600px){.app{margin:0;height:100vh;border-radius:0}.message{max-width:92%}}
+</style></head>
+<body><div class="app"><header><h1>💬 MiniChat</h1><p>Discute avec tes amis en ligne</p></header><section id="connexion"><input id="pseudo" maxlength="25" placeholder="Ton pseudo"><button id="rejoindre">Rejoindre le chat</button></section><section id="chat"><div id="messages"></div><div id="statut"></div><div id="erreur"></div><form id="formulaire"><input id="texte" maxlength="500" placeholder="Écris ton message..." autocomplete="off"><button>Envoyer</button></form></section></div>
+<script>
+const SUPABASE_URL="https://yntyarldepwjlbbeobja.supabase.co";
+const SUPABASE_KEY="sb_publishable__x0aufIhmmpaAj_FdTyc-w_RPgErGE9";
+const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let pseudoActuel="";
+const zone=document.getElementById("messages"),erreur=document.getElementById("erreur");
+function fail(t){erreur.textContent=t;console.error(t)}
+function afficher(m){const d=document.createElement("div");d.className="message"+(m.pseudo===pseudoActuel?" moi":"");const n=document.createElement("strong"),t=document.createElement("span");n.textContent=m.pseudo+" : ";t.textContent=m.text;d.append(n,t);zone.appendChild(d);zone.scrollTop=zone.scrollHeight}
+async function rejoindre(){pseudoActuel=document.getElementById("pseudo").value.trim();if(!pseudoActuel)return alert("Écris un pseudo.");document.getElementById("connexion").style.display="none";document.getElementById("chat").style.display="flex";document.getElementById("statut").textContent="Connecté en tant que "+pseudoActuel;const r=await client.from("messages").select("id,created_at,pseudo,text").order("created_at",{ascending:true}).limit(100);if(r.error)return fail("Impossible de charger les messages. Vérifie les règles RLS dans Supabase.");r.data.forEach(afficher);client.channel("messages-en-direct").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},p=>afficher(p.new)).subscribe()}
+document.getElementById("rejoindre").onclick=rejoindre;document.getElementById("formulaire").onsubmit=async e=>{e.preventDefault();const c=document.getElementById("texte"),text=c.value.trim();if(!text||!pseudoActuel)return;const r=await client.from("messages").insert({pseudo:pseudoActuel,text});if(r.error)fail("Message non envoyé. Vérifie la règle INSERT dans Supabase.");else c.value=""};
+</script></body></html>
