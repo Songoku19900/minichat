@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>MiniChat</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,302 +16,467 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: #eef2ff;
-    color: #172033;
+    color: #1e293b;
+}
+
+.application {
+    display: flex;
+    max-width: 1150px;
+    height: 92vh;
+    margin: 4vh auto;
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 35px #0002;
+}
+
+.menu {
+    width: 240px;
+    background: #312e81;
+    color: white;
+    padding: 20px;
+}
+
+.menu h1 {
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.menu button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: #4f46e5;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menu button:hover,
+.menu button.actif {
+    background: #818cf8;
+}
+
+.contenu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
 header {
     background: #4f46e5;
     color: white;
-    padding: 20px;
-    text-align: center;
+    padding: 18px;
 }
 
-header h1 {
-    margin: 0 0 8px;
+header h2 {
+    margin: 0 0 5px;
 }
 
-main {
-    max-width: 900px;
-    margin: 25px auto;
-    padding: 15px;
-}
-
-.card {
-    background: white;
-    border-radius: 16px;
-    padding: 22px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    margin-bottom: 18px;
-}
-
-input,
-textarea,
-button {
-    font: inherit;
-    border-radius: 9px;
-    padding: 12px;
-}
-
-input,
-textarea {
-    width: 100%;
-    border: 1px solid #cbd5e1;
-    margin: 7px 0;
-}
-
-button {
-    border: none;
-    background: #4f46e5;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-button:hover {
-    background: #3730a3;
-}
-
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-nav {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 18px;
-}
-
-nav button {
+.page {
+    display: none;
     flex: 1;
+    min-height: 0;
+    flex-direction: column;
+    padding: 20px;
 }
 
-.hidden {
-    display: none !important;
+.page.actif {
+    display: flex;
 }
 
-.error {
-    color: #b91c1c;
-    white-space: pre-wrap;
-    margin-top: 10px;
-}
-
-.success {
-    color: #15803d;
-    margin-top: 10px;
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 12px;
 }
 
 .message {
-    background: #f1f5f9;
-    border-radius: 10px;
-    padding: 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px;
     margin: 8px 0;
+    max-width: 85%;
     overflow-wrap: anywhere;
 }
 
-.message b {
-    color: #4f46e5;
+.message.moi {
+    margin-left: auto;
+    background: #e0e7ff;
 }
 
-small {
+.message small {
+    display: block;
     color: #64748b;
+    margin-bottom: 5px;
 }
 
-#listeMessages {
-    max-height: 400px;
-    overflow-y: auto;
-    margin-bottom: 15px;
+form,
+.ligne {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    font: inherit;
+}
+
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 9px;
+    background: #4f46e5;
+    color: white;
+    cursor: pointer;
+    font: inherit;
+}
+
+button:hover {
+    filter: brightness(0.95);
+}
+
+.bouton-secondaire {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.information {
+    background: #fff7ed;
+    color: #9a3412;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.erreur {
+    color: #b91c1c;
+    margin-top: 8px;
+    white-space: pre-wrap;
+}
+
+.liste-groupes {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.groupe-bouton {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.groupe-bouton.selectionne {
+    background: #a5b4fc;
+}
+
+#connexion {
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 10;
+}
+
+.boite-connexion {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    width: 100%;
+    max-width: 410px;
+}
+
+@media (max-width: 650px) {
+    .application {
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .menu {
+        width: 70px;
+        padding: 8px;
+    }
+
+    .menu h1 {
+        font-size: 0;
+    }
+
+    .menu h1::after {
+        content: "💬";
+        font-size: 25px;
+    }
+
+    .menu button {
+        font-size: 0;
+        text-align: center;
+        padding: 14px 4px;
+    }
+
+    .menu button::first-letter {
+        font-size: 20px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<header>
-    <h1>💬 MiniChat</h1>
-    <div id="statut">Non connecté</div>
-</header>
-
-<main>
-
-    <!-- CONNEXION -->
-    <section id="connexion" class="card">
-
-        <h2>Entrer dans MiniChat</h2>
-
-        <p>Choisis un pseudo pour entrer dans le chat.</p>
+<!-- CONNEXION -->
+<div id="connexion">
+    <div class="boite-connexion">
+        <h2>💬 Bienvenue sur MiniChat</h2>
+        <p>Choisis ton pseudo pour commencer.</p>
 
         <input
             id="pseudoInput"
-            type="text"
-            maxlength="30"
+            maxlength="25"
             placeholder="Ton pseudo"
-            autocomplete="off"
+            style="width:100%"
         >
 
-        <button
-            id="boutonConnexion"
-            type="button"
-            style="width:100%; margin-top:10px;"
-        >
+        <button id="boutonConnexion" style="width:100%;margin-top:10px">
             Entrer dans MiniChat
         </button>
 
-        <div id="erreurConnexion" class="error"></div>
+        <div id="erreurConnexion" class="erreur"></div>
+    </div>
+</div>
 
-    </section>
+<div class="application">
 
+    <!-- MENU -->
+    <aside class="menu">
+        <h1>MiniChat</h1>
 
-    <!-- APPLICATION -->
-    <section id="application" class="hidden">
+        <button class="navigation actif" data-page="public">
+            🌍 Discussion publique
+        </button>
 
-        <nav>
-            <button type="button" id="btnPublic">
-                💬 Public
-            </button>
+        <button class="navigation" data-page="prive">
+            🔒 Messages privés
+        </button>
 
-            <button type="button" id="btnProfil">
-                👤 Profil
-            </button>
+        <button class="navigation" data-page="groupes">
+            👥 Groupes
+        </button>
 
-            <button type="button" id="btnDeconnexion">
-                🚪 Quitter
-            </button>
-        </nav>
+        <button class="navigation" data-page="profil">
+            ⚙️ Mon profil
+        </button>
+    </aside>
 
+    <main class="contenu">
 
-        <!-- CHAT PUBLIC -->
-        <section id="public" class="card">
+        <header>
+            <h2 id="titrePage">Discussion publique</h2>
+            <div id="utilisateurConnecte"></div>
+        </header>
 
-            <h2>💬 Discussion publique</h2>
+        <!-- PAGE PUBLIQUE -->
+        <section id="public" class="page actif">
+            <div id="messagesPublics" class="messages"></div>
 
-            <div id="listeMessages">
-                <small>Aucun message pour le moment.</small>
+            <form id="formulairePublic">
+                <input
+                    id="textePublic"
+                    maxlength="500"
+                    placeholder="Écris un message public..."
+                >
+                <button>Envoyer</button>
+            </form>
+
+            <div id="erreurPublic" class="erreur"></div>
+        </section>
+
+        <!-- PAGE PRIVÉE -->
+        <section id="prive" class="page">
+
+            <div class="ligne">
+                <input
+                    id="pseudoDestinataire"
+                    maxlength="25"
+                    placeholder="Pseudo du destinataire"
+                >
+
+                <button id="ouvrirConversation">
+                    Ouvrir
+                </button>
             </div>
 
-            <textarea
-                id="messageInput"
-                rows="3"
-                maxlength="500"
-                placeholder="Écris ton message..."
-            ></textarea>
+            <div id="informationPrivee" class="information">
+                Choisis un pseudo pour ouvrir une conversation privée.
+            </div>
 
-            <button
-                type="button"
-                id="btnEnvoyer"
-            >
-                Envoyer
-            </button>
+            <div id="messagesPrives" class="messages"></div>
 
-            <div id="erreurChat" class="error"></div>
+            <form id="formulairePrive">
+                <input
+                    id="textePrive"
+                    maxlength="500"
+                    placeholder="Écris un message privé..."
+                >
+                <button>Envoyer</button>
+            </form>
 
+            <div id="erreurPrive" class="erreur"></div>
         </section>
 
+        <!-- PAGE GROUPES -->
+        <section id="groupes" class="page">
 
-        <!-- PROFIL -->
-        <section id="profil" class="card hidden">
+            <div class="ligne">
+                <input
+                    id="nomGroupe"
+                    maxlength="50"
+                    placeholder="Nom du nouveau groupe"
+                >
 
-            <h2>👤 Mon profil</h2>
+                <button id="creerGroupe">
+                    Créer
+                </button>
+            </div>
 
-            <p>
-                Connecté en tant que :
-                <b id="pseudoAffiche"></b>
-            </p>
+            <div id="listeGroupes" class="liste-groupes"></div>
 
-            <input
-                id="nouveauPseudo"
-                type="text"
-                maxlength="30"
-                placeholder="Nouveau pseudo"
-            >
+            <div id="informationGroupe" class="information">
+                Sélectionne un groupe.
+            </div>
 
-            <button
-                type="button"
-                id="btnChangerPseudo"
-            >
+            <div id="messagesGroupes" class="messages"></div>
+
+            <form id="formulaireGroupe">
+                <input
+                    id="texteGroupe"
+                    maxlength="500"
+                    placeholder="Écris dans le groupe..."
+                >
+                <button>Envoyer</button>
+            </form>
+
+            <div id="erreurGroupe" class="erreur"></div>
+        </section>
+
+        <!-- PAGE PROFIL -->
+        <section id="profil" class="page">
+            <h3>Mon profil</h3>
+            <p id="texteProfil"></p>
+            <p>Ton pseudo est enregistré dans ce navigateur.</p>
+
+            <button id="changerPseudo" class="bouton-secondaire">
                 Changer de pseudo
             </button>
-
-            <div id="erreurProfil" class="error"></div>
-
-            <div id="succesProfil" class="success"></div>
-
         </section>
 
-    </section>
-
-</main>
-
+    </main>
+</div>
 
 <script>
-"use strict";
-
-/* ============================= */
-/* CONFIGURATION SUPABASE        */
-/* ============================= */
+/* CONFIGURATION SUPABASE */
 
 const SUPABASE_URL =
     "https://yntyarldepwjlbbeobja.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable__x0aufIHmmpaAj_FdTyc-w_RPgErGE9";
+    "sb_publishable__x0aufIhmmpaAj_FdTyc-w_RPgErGE9";
 
-let client = null;
+const base = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+/* VARIABLES */
+
 let pseudo = localStorage.getItem("minichat_pseudo") || "";
+let conversationActuelle = null;
+let groupeActuel = null;
 
-
-/* ============================= */
-/* OUTILS                        */
-/* ============================= */
-
-function element(id) {
-    return document.getElementById(id);
+function id(nom) {
+    return document.getElementById(nom);
 }
 
-function afficherErreur(id, message) {
-    const zone = element(id);
+function afficherErreur(element, message = "") {
+    id(element).textContent = message;
+}
 
-    if (zone) {
-        zone.textContent = message || "";
+/* NAVIGATION */
+
+document.querySelectorAll(".navigation").forEach(bouton => {
+    bouton.addEventListener("click", () => {
+        const page = bouton.dataset.page;
+
+        document.querySelectorAll(".page").forEach(section => {
+            section.classList.toggle("actif", section.id === page);
+        });
+
+        document.querySelectorAll(".navigation").forEach(b => {
+            b.classList.toggle("actif", b === bouton);
+        });
+
+        const titres = {
+            public: "Discussion publique",
+            prive: "Messages privés",
+            groupes: "Groupes",
+            profil: "Mon profil"
+        };
+
+        id("titrePage").textContent = titres[page];
+
+        if (page === "public") chargerMessagesPublics();
+        if (page === "groupes") chargerGroupes();
+    });
+});
+
+/* AFFICHAGE DES MESSAGES */
+
+function afficherMessage(element, message) {
+    const bloc = document.createElement("div");
+
+    bloc.className = "message";
+
+    if (message.pseudo === pseudo) {
+        bloc.classList.add("moi");
     }
+
+    const auteur = document.createElement("small");
+    auteur.textContent =
+        message.pseudo +
+        " • " +
+        new Date(message.created_at).toLocaleString("fr-FR");
+
+    const texte = document.createElement("div");
+    texte.textContent = message.text;
+
+    bloc.appendChild(auteur);
+    bloc.appendChild(texte);
+
+    id(element).appendChild(bloc);
+
+
 }
 
 
-/* ============================= */
-/* AFFICHAGE                     */
-/* ============================= */
-
-function actualiserAffichage() {
-
-    const connecte = pseudo !== "";
-
-    element("connexion").classList.toggle(
-        "hidden",
-        connecte
-    );
-
-    element("application").classList.toggle(
-        "hidden",
-        !connecte
-    );
-
-    element("statut").textContent = connecte
-        ? "Connecté : " + pseudo
-        : "Non connecté";
-
-    element("pseudoAffiche").textContent = pseudo;
-}
-
-
-/* ============================= */
-/* CONNEXION                     */
-/* ============================= */
+/* UTILISATEUR */
 
 async function connecterPseudo() {
-
-    const nouveauPseudo =
-        element("pseudoInput").value.trim();
+    const nouveauPseudo = id("pseudoInput").value.trim();
 
     if (!nouveauPseudo) {
         afficherErreur(
@@ -322,37 +486,29 @@ async function connecterPseudo() {
         return;
     }
 
-    if (!client) {
-        afficherErreur(
-            "erreurConnexion",
-            "Supabase ne s'est pas chargé. Recharge la page."
-        );
-        return;
-    }
-
-    element("boutonConnexion").disabled = true;
-
     afficherErreur(
         "erreurConnexion",
         "Connexion en cours..."
     );
 
     try {
-
-        const resultat = await client
+        const resultat = await base
             .from("utilisateurs")
-            .upsert(
-                {
-                    pseudo: nouveauPseudo
-                },
-                {
-                    onConflict: "pseudo",
-                    ignoreDuplicates: true
-                }
-            );
+            .insert({
+                pseudo: nouveauPseudo
+            });
 
-        if (resultat.error) {
-            throw resultat.error;
+        if (resultat.error && resultat.error.code !== "23505") {
+            afficherErreur(
+                "erreurConnexion",
+                "Erreur Supabase : " +
+                resultat.error.message +
+                "\nCode : " +
+                resultat.error.code +
+                "\nDétails : " +
+                (resultat.error.details || "Aucun")
+            );
+            return;
         }
 
         pseudo = nouveauPseudo;
@@ -362,448 +518,491 @@ async function connecterPseudo() {
             pseudo
         );
 
-        afficherErreur(
-            "erreurConnexion",
-            ""
-        );
+        id("connexion").style.display = "none";
 
-        actualiserAffichage();
+        actualiserProfil();
 
-        await chargerMessages();
+        await chargerMessagesPublics();
+        await chargerGroupes();
 
     } catch (erreur) {
-
         afficherErreur(
             "erreurConnexion",
-
-            "Impossible d'entrer dans MiniChat.\n\n" +
-            "Erreur : " +
-            (erreur.message || erreur) +
-            "\n\n" +
-            "Si le message parle de RLS ou de permissions, " +
-            "il faut modifier les règles de sécurité dans Supabase."
+            "Erreur de connexion : " +
+            erreur.message
         );
-
-    } finally {
-
-        element("boutonConnexion").disabled = false;
-
     }
 }
 
+/* DISCUSSION PUBLIQUE */
 
-/* ============================= */
-/* CHARGER LES MESSAGES          */
-/* ============================= */
+let dernierContenuPublic = "";
 
-async function chargerMessages() {
+async function chargerMessagesPublics() {
+    const resultat = await base
+        .from("messages")
+        .select("id,pseudo,text,created_at")
+        .order("created_at", { ascending: true })
+        .limit(100);
 
-    if (!client) {
+    if (resultat.error) {
+        afficherErreur("erreurPublic", resultat.error.message);
         return;
     }
 
-    const zone =
-        element("listeMessages");
+    const signature = JSON.stringify(resultat.data);
 
-    try {
+    // Si aucun message n'a changé, on ne reconstruit pas l'affichage
+    if (signature === dernierContenuPublic) {
+        return;
+    }
 
-        const resultat = await client
-            .from("messages")
-            .select("*")
-            .order(
-                "created_at",
-                {
-                    ascending: true
-                }
-            )
-            .limit(100);
+    dernierContenuPublic = signature;
 
-        if (resultat.error) {
-            throw resultat.error;
+    const zone = id("messagesPublics");
+
+    const ancienScroll = zone.scrollTop;
+
+    const etaitEnBas =
+        zone.scrollHeight - zone.scrollTop - zone.clientHeight < 30;
+
+    const nouveauContenu =
+        document.createDocumentFragment();
+
+    resultat.data.forEach(message => {
+        const bloc = document.createElement("div");
+
+        bloc.className = "message";
+
+        if (message.pseudo === pseudo) {
+            bloc.classList.add("moi");
         }
 
-        const messages = resultat.data || [];
+        const auteur = document.createElement("small");
 
-        zone.innerHTML = "";
+        auteur.textContent =
+            message.pseudo +
+            " • " +
+            new Date(message.created_at).toLocaleString("fr-FR");
 
-        if (messages.length === 0) {
+        const texte = document.createElement("div");
 
-            zone.innerHTML =
-                "<small>Aucun message pour le moment.</small>";
+        texte.textContent = message.text;
 
+        bloc.appendChild(auteur);
+        bloc.appendChild(texte);
+
+        nouveauContenu.appendChild(bloc);
+    });
+
+    // Remplace tous les messages en une seule fois
+    zone.replaceChildren(nouveauContenu);
+
+    // Conserve la position de défilement
+    if (etaitEnBas) {
+        zone.scrollTop = zone.scrollHeight;
+    } else {
+        zone.scrollTop = ancienScroll;
+    }
+}
+
+id("formulairePublic").addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
+
+        const texte = id("textePublic").value.trim();
+
+        if (!texte) {
             return;
         }
 
-        messages.forEach(message => {
-
-            const bloc =
-                document.createElement("div");
-
-            bloc.className = "message";
-
-            const auteur =
-                message.pseudo ||
-                message.auteur ||
-                "Utilisateur";
-
-            const texte =
-                message.message ||
-                message.texte ||
-                message.contenu ||
-                "";
-
-            const nom =
-                document.createElement("b");
-
-            nom.textContent = auteur;
-
-            const contenu =
-                document.createElement("span");
-
-            contenu.textContent = texte;
-
-            bloc.appendChild(nom);
-
-            bloc.appendChild(
-                document.createElement("br")
-            );
-
-            bloc.appendChild(contenu);
-
-            zone.appendChild(bloc);
-
-        });
-
-    } catch (erreur) {
-
-        afficherErreur(
-            "erreurChat",
-            "Impossible de charger les messages : " +
-            (erreur.message || erreur)
-        );
-
-    }
-}
-
-
-/* ============================= */
-/* ENVOYER UN MESSAGE            */
-/* ============================= */
-
-async function envoyerMessage() {
-
-    const champ =
-        element("messageInput");
-
-    const texte =
-        champ.value.trim();
-
-    if (!texte) {
-        return;
-    }
-
-    if (!client) {
-        afficherErreur(
-            "erreurChat",
-            "Supabase n'est pas disponible."
-        );
-        return;
-    }
-
-    element("btnEnvoyer").disabled = true;
-
-    afficherErreur(
-        "erreurChat",
-        ""
-    );
-
-    try {
-
-        const resultat = await client
+        const resultat = await base
             .from("messages")
             .insert({
                 pseudo: pseudo,
-                message: texte
+                text: texte
             });
 
         if (resultat.error) {
-            throw resultat.error;
+            afficherErreur(
+                "erreurPublic",
+                resultat.error.message
+            );
+            return;
         }
 
-        champ.value = "";
+        id("textePublic").value = "";
 
-        await chargerMessages();
-
-    } catch (erreur) {
-
-        afficherErreur(
-            "erreurChat",
-            "Impossible d'envoyer le message : " +
-            (erreur.message || erreur)
-        );
-
-    } finally {
-
-        element("btnEnvoyer").disabled = false;
-
+        await chargerMessagesPublics();
     }
+);
+
+/* MESSAGES PRIVÉS */
+
+let destinataireActuel = "";
+
+/* Trouver une conversation existante dans les deux sens */
+async function trouverConversation(destinataire) {
+    const recherche1 = await base
+        .from("conversations_privees")
+        .select("id, utilisateur1, utilisateur2")
+        .eq("utilisateur1", pseudo)
+        .eq("utilisateur2", destinataire)
+        .limit(1);
+
+    if (recherche1.error) {
+        throw recherche1.error;
+    }
+
+    if (recherche1.data.length > 0) {
+        return recherche1.data[0];
+    }
+
+    const recherche2 = await base
+        .from("conversations_privees")
+        .select("id, utilisateur1, utilisateur2")
+        .eq("utilisateur1", destinataire)
+        .eq("utilisateur2", pseudo)
+        .limit(1);
+
+    if (recherche2.error) {
+        throw recherche2.error;
+    }
+
+    if (recherche2.data.length > 0) {
+        return recherche2.data[0];
+    }
+
+    return null;
 }
 
+/* Ouvrir une conversation */
+async function ouvrirLaConversation() {
+    const destinataire = id("pseudoDestinataire").value.trim();
 
-/* ============================= */
-/* CHANGER DE PAGE               */
-/* ============================= */
+    afficherErreur("erreurPrive", "");
 
-function changerVue(vue) {
-
-    element("public").classList.toggle(
-        "hidden",
-        vue !== "public"
-    );
-
-    element("profil").classList.toggle(
-        "hidden",
-        vue !== "profil"
-    );
-
-}
-
-
-/* ============================= */
-/* CHANGER DE PSEUDO             */
-/* ============================= */
-
-async function changerPseudo() {
-
-    const nouveau =
-        element("nouveauPseudo").value.trim();
-
-    if (!nouveau) {
-
+    if (!destinataire) {
         afficherErreur(
-            "erreurProfil",
-            "Entre un nouveau pseudo."
+            "erreurPrive",
+            "Entre le pseudo du destinataire."
         );
+        return;
+    }
 
+    if (destinataire.toLowerCase() === pseudo.toLowerCase()) {
+        afficherErreur(
+            "erreurPrive",
+            "Tu ne peux pas discuter avec toi-même."
+        );
         return;
     }
 
     try {
+        let conversation = await trouverConversation(destinataire);
 
-        const resultat = await client
-            .from("utilisateurs")
-            .upsert(
-                {
-                    pseudo: nouveau
-                },
-                {
-                    onConflict: "pseudo",
-                    ignoreDuplicates: true
-                }
-            );
+        /* Si la conversation n'existe pas, on la crée */
+        if (!conversation) {
+            const creation = await base
+                .from("conversations_privees")
+                .insert({
+                    utilisateur1: pseudo,
+                    utilisateur2: destinataire
+                })
+                .select("id, utilisateur1, utilisateur2")
+                .single();
 
-        if (resultat.error) {
-            throw resultat.error;
+            if (creation.error) {
+                throw creation.error;
+            }
+
+            conversation = creation.data;
         }
 
-        pseudo = nouveau;
+        conversationActuelle = conversation.id;
+        destinataireActuel = destinataire;
 
-        localStorage.setItem(
-            "minichat_pseudo",
-            pseudo
-        );
+        id("informationPrivee").textContent =
+            "Conversation avec : " + destinataire;
 
-        actualiserAffichage();
-
-        element("nouveauPseudo").value = "";
-
-        afficherErreur(
-            "erreurProfil",
-            ""
-        );
-
-        element("succesProfil").textContent =
-            "Pseudo changé avec succès.";
+        await chargerMessagesPrives();
 
     } catch (erreur) {
-
         afficherErreur(
-            "erreurProfil",
-            "Impossible de changer le pseudo : " +
-            (erreur.message || erreur)
+            "erreurPrive",
+            "Erreur : " + erreur.message
         );
-
     }
 }
 
+/* Bouton Ouvrir */
+id("ouvrirConversation").addEventListener(
+    "click",
+    ouvrirLaConversation
+);
 
-/* ============================= */
-/* DÉCONNEXION                   */
-/* ============================= */
+/* Appuyer sur Entrée dans le champ du destinataire */
+id("pseudoDestinataire").addEventListener(
+    "keydown",
+    event => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            ouvrirLaConversation();
+        }
+    }
+);
 
-function deconnecter() {
+/* Charger les messages de la conversation */
+async function chargerMessagesPrives() {
+    if (!conversationActuelle) {
+        return;
+    }
 
-    pseudo = "";
+    const resultat = await base
+        .from("messages_prives")
+        .select("pseudo, text, created_at")
+        .eq("conversation_id", conversationActuelle)
+        .order("created_at", {
+            ascending: true
+        });
 
-    localStorage.removeItem(
-        "minichat_pseudo"
-    );
+    if (resultat.error) {
+        afficherErreur(
+            "erreurPrive",
+            resultat.error.message
+        );
+        return;
+    }
 
-    element("pseudoInput").value = "";
+    id("messagesPrives").innerHTML = "";
 
-    actualiserAffichage();
+    resultat.data.forEach(message => {
+        afficherMessage("messagesPrives", message);
+    });
 
-    changerVue("public");
-
+    id("messagesPrives").scrollTop =
+        id("messagesPrives").scrollHeight;
 }
 
+/* Envoyer un message privé */
+id("formulairePrive").addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
 
-/* ============================= */
-/* INITIALISATION                */
-/* ============================= */
+        const texte = id("textePrive").value.trim();
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
+        if (!texte) {
+            return;
+        }
 
-        if (!window.supabase) {
-
+        if (!conversationActuelle) {
             afficherErreur(
-                "erreurConnexion",
-                "La bibliothèque Supabase ne s'est pas chargée. " +
-                "Vérifie ta connexion Internet puis recharge la page."
+                "erreurPrive",
+                "Ouvre d'abord une conversation."
             );
-
-        } else {
-
-            client =
-                window.supabase.createClient(
-                    SUPABASE_URL,
-                    SUPABASE_KEY
-                );
-
+            return;
         }
 
+        const resultat = await base
+            .from("messages_prives")
+            .insert({
+                conversation_id: conversationActuelle,
+                pseudo: pseudo,
+                text: texte
+            });
 
-        element("boutonConnexion")
-            .addEventListener(
-                "click",
-                connecterPseudo
+        if (resultat.error) {
+            afficherErreur(
+                "erreurPrive",
+                resultat.error.message
             );
-
-
-        element("pseudoInput")
-            .addEventListener(
-                "keydown",
-                function(event) {
-
-                    if (event.key === "Enter") {
-                        connecterPseudo();
-                    }
-
-                }
-            );
-
-
-        element("btnEnvoyer")
-            .addEventListener(
-                "click",
-                envoyerMessage
-            );
-
-
-        element("messageInput")
-            .addEventListener(
-                "keydown",
-                function(event) {
-
-                    if (
-                        event.key === "Enter" &&
-                        !event.shiftKey
-                    ) {
-
-                        event.preventDefault();
-
-                        envoyerMessage();
-
-                    }
-
-                }
-            );
-
-
-        element("btnPublic")
-            .addEventListener(
-                "click",
-                function() {
-                    changerVue("public");
-                }
-            );
-
-
-        element("btnProfil")
-            .addEventListener(
-                "click",
-                function() {
-                    changerVue("profil");
-                }
-            );
-
-
-        element("btnDeconnexion")
-            .addEventListener(
-                "click",
-                deconnecter
-            );
-
-
-        element("btnChangerPseudo")
-            .addEventListener(
-                "click",
-                changerPseudo
-            );
-
-
-        actualiserAffichage();
-
-
-        if (pseudo) {
-            chargerMessages();
+            return;
         }
 
+        id("textePrive").value = "";
+        afficherErreur("erreurPrive", "");
+
+        await chargerMessagesPrives();
     }
 );
 
+/* Actualiser automatiquement les messages toutes les 2 secondes */
+setInterval(() => {
+    if (conversationActuelle) {
+        chargerMessagesPrives();
+    }
+}, 2000);
 
-/* ============================= */
-/* AFFICHER LES ERREURS JS       */
-/* ============================= */
+/* GROUPES */
 
-window.addEventListener(
-    "error",
-    function(event) {
+/* Charger la liste des groupes */
+async function chargerGroupes() {
+    const resultat = await base
+        .from("groupes")
+        .select("id,nom,createur")
+        .order("created_at", { ascending: true });
 
-        if (!pseudo) {
+    if (resultat.error) {
+        afficherErreur("erreurGroupe", resultat.error.message);
+        return;
+    }
 
-            afficherErreur(
-                "erreurConnexion",
-                "Erreur JavaScript : " +
-                event.message
-            );
+    id("listeGroupes").innerHTML = "";
 
-        } else {
+    resultat.data.forEach(groupe => {
+        const bouton = document.createElement("button");
 
-            afficherErreur(
-                "erreurChat",
-                "Erreur JavaScript : " +
-                event.message
-            );
+        bouton.className = "groupe-bouton";
 
+        if (groupe.id === groupeActuel) {
+            bouton.classList.add("selectionne");
         }
 
-    }
-);
+        bouton.textContent = "👥 " + groupe.nom;
 
+        bouton.addEventListener("click", () => {
+            choisirGroupe(groupe);
+        });
+
+        id("listeGroupes").appendChild(bouton);
+    });
+}
+
+/* Créer un groupe */
+id("creerGroupe").addEventListener("click", async () => {
+    const nom = id("nomGroupe").value.trim();
+
+    if (!nom) return;
+
+    const resultat = await base
+        .from("groupes")
+        .insert({
+            nom: nom,
+            createur: pseudo
+        })
+        .select()
+        .single();
+
+    if (resultat.error) {
+        afficherErreur("erreurGroupe", resultat.error.message);
+        return;
+    }
+
+    const ajoutMembre = await base
+        .from("membres_groupes")
+        .insert({
+            groupe_id: resultat.data.id,
+            pseudo: pseudo
+        });
+
+    if (ajoutMembre.error) {
+        afficherErreur("erreurGroupe", ajoutMembre.error.message);
+        return;
+    }
+
+    id("nomGroupe").value = "";
+    groupeActuel = resultat.data.id;
+
+    await chargerGroupes();
+    await choisirGroupe(resultat.data);
+});
+
+/* Sélectionner un groupe */
+async function choisirGroupe(groupe) {
+    groupeActuel = groupe.id;
+
+    id("informationGroupe").textContent =
+        "Groupe : " + groupe.nom +
+        " • Créateur : " + groupe.createur;
+
+    await chargerMessagesGroupes();
+    await chargerGroupes();
+}
+
+/* Charger les messages du groupe */
+async function chargerMessagesGroupes() {
+    if (!groupeActuel) return;
+
+    const resultat = await base
+        .from("messages_groupes")
+        .select("pseudo,text,created_at")
+        .eq("groupe_id", groupeActuel)
+        .order("created_at", { ascending: true });
+
+    if (resultat.error) {
+        afficherErreur("erreurGroupe", resultat.error.message);
+        return;
+    }
+
+    id("messagesGroupes").innerHTML = "";
+
+    resultat.data.forEach(message => {
+        afficherMessage("messagesGroupes", message);
+    });
+
+    id("messagesGroupes").scrollTop =
+        id("messagesGroupes").scrollHeight;
+}
+
+/* Envoyer un message dans le groupe sélectionné */
+id("formulaireGroupe").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const texte = id("texteGroupe").value.trim();
+
+    if (!texte) return;
+
+    if (!groupeActuel) {
+        afficherErreur(
+            "erreurGroupe",
+            "Sélectionne d'abord un groupe."
+        );
+        return;
+    }
+
+    const resultat = await base
+        .from("messages_groupes")
+        .insert({
+            groupe_id: groupeActuel,
+            pseudo: pseudo,
+            text: texte
+        });
+
+    if (resultat.error) {
+        afficherErreur("erreurGroupe", resultat.error.message);
+        return;
+    }
+
+    id("texteGroupe").value = "";
+    afficherErreur("erreurGroupe", "");
+
+    await chargerMessagesGroupes();
+});
+
+/* Actualisation automatique toutes les 2 secondes */
+setInterval(() => {
+    if (groupeActuel) {
+        chargerMessagesGroupes();
+    }
+}, 2000);
+
+/* CHANGER DE PSEUDO */
+
+id("changerPseudo").addEventListener("click", () => {
+    localStorage.removeItem("minichat_pseudo");
+    location.reload();
+});
+
+/* DÉMARRAGE */
+
+if (pseudo) {
+    id("connexion").style.display = "none";
+    actualiserProfil();
+    chargerMessagesPublics();
+    chargerGroupes();
+}
 </script>
 
 </body>
