@@ -489,8 +489,13 @@ async function connecterPseudo() {
     if (resultat.error && resultat.error.code !== "23505") {
         afficherErreur(
             "erreurConnexion",
-            "Impossible d'enregistrer le pseudo. Vérifie les règles RLS."
+            "Erreur Supabase :\n" +
+            "Message : " + resultat.error.message + "\n" +
+            "Code : " + resultat.error.code + "\n" +
+            "Détails : " + (resultat.error.details || "Aucun") + "\n" +
+            "Conseil : " + (resultat.error.hint || "Aucun")
         );
+
         return;
     }
 
@@ -505,23 +510,6 @@ async function connecterPseudo() {
     chargerMessagesPublics();
     chargerGroupes();
 }
-
-function actualiserProfil() {
-    id("utilisateurConnecte").textContent =
-        "Connecté : " + pseudo;
-
-    id("texteProfil").textContent =
-        "Pseudo actuel : " + pseudo;
-}
-
-id("boutonConnexion").addEventListener("click", connecterPseudo);
-
-id("pseudoInput").addEventListener("keydown", event => {
-    if (event.key === "Enter") {
-        connecterPseudo();
-    }
-});
-
 /* DISCUSSION PUBLIQUE */
 
 let dernierContenuPublic = "";
