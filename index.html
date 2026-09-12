@@ -769,6 +769,7 @@ setInterval(() => {
 
 /* GROUPES */
 
+/* Charger la liste des groupes */
 async function chargerGroupes() {
     const resultat = await base
         .from("groupes")
@@ -801,6 +802,7 @@ async function chargerGroupes() {
     });
 }
 
+/* Créer un groupe */
 id("creerGroupe").addEventListener("click", async () => {
     const nom = id("nomGroupe").value.trim();
 
@@ -820,21 +822,26 @@ id("creerGroupe").addEventListener("click", async () => {
         return;
     }
 
-    await base
+    const ajoutMembre = await base
         .from("membres_groupes")
         .insert({
             groupe_id: resultat.data.id,
             pseudo: pseudo
         });
 
-    id("nomGroupe").value = "";
+    if (ajoutMembre.error) {
+        afficherErreur("erreurGroupe", ajoutMembre.error.message);
+        return;
+    }
 
+    id("nomGroupe").value = "";
     groupeActuel = resultat.data.id;
 
     await chargerGroupes();
-    choisirGroupe(resultat.data);
+    await choisirGroupe(resultat.data);
 });
 
+/* Sélectionner un groupe */
 async function choisirGroupe(groupe) {
     groupeActuel = groupe.id;
 
@@ -843,13 +850,12 @@ async function choisirGroupe(groupe) {
         " • Créateur : " + groupe.createur;
 
     await chargerMessagesGroupes();
-    chargerGroupes();
+    await chargerGroupes();
 }
 
+/* Charger les messages du groupe */
 async function chargerMessagesGroupes() {
     if (!groupeActuel) return;
-
-    id("messagesGroupes").innerHTML = "";
 
     const resultat = await base
         .from("messages_groupes")
@@ -862,17 +868,31 @@ async function chargerMessagesGroupes() {
         return;
     }
 
+    id("messagesGroupes").innerHTML = "";
+
     resultat.data.forEach(message => {
         afficherMessage("messagesGroupes", message);
     });
+
+    id("messagesGroupes").scrollTop =
+        id("messagesGroupes").scrollHeight;
 }
 
+/* Envoyer un message dans le groupe sélectionné */
 id("formulaireGroupe").addEventListener("submit", async event => {
     event.preventDefault();
 
     const texte = id("texteGroupe").value.trim();
 
-    if (!texte || !groupeActuel) return;
+    if (!texte) return;
+
+    if (!groupeActuel) {
+        afficherErreur(
+            "erreurGroupe",
+            "Sélectionne d'abord un groupe."
+        );
+        return;
+    }
 
     const resultat = await base
         .from("messages_groupes")
@@ -888,9 +908,17 @@ id("formulaireGroupe").addEventListener("submit", async event => {
     }
 
     id("texteGroupe").value = "";
+    afficherErreur("erreurGroupe", "");
 
-    chargerMessagesGroupes();
+    await chargerMessagesGroupes();
 });
+
+/* Actualisation automatique toutes les 2 secondes */
+setInterval(() => {
+    if (groupeActuel) {
+        chargerMessagesGroupes();
+    }
+}, 2000);
 
 /* CHANGER DE PSEUDO */
 
@@ -907,6 +935,14 @@ if (pseudo) {
     chargerMessagesPublics();
     chargerGroupes();
 }
+
+// Actualisation automatique de la discussion publique
+setInterval(async () => {
+    if (pseudo !== "") {
+        await chargerMessagesPublics();
+    }
+}, 2000);
+
 </script>
 
 </body>
