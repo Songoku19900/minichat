@@ -271,7 +271,11 @@ function element(id) {
 }
 
 function afficherErreur(id, message) {
-    element(id).textContent = message || "";
+    const zone = element(id);
+
+    if (zone) {
+        zone.textContent = message || "";
+    }
 }
 
 
@@ -459,9 +463,11 @@ async function chargerMessages() {
             contenu.textContent = texte;
 
             bloc.appendChild(nom);
+
             bloc.appendChild(
                 document.createElement("br")
             );
+
             bloc.appendChild(contenu);
 
             zone.appendChild(bloc);
