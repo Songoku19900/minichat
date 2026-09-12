@@ -468,6 +468,15 @@ function afficherMessage(element, message) {
     bloc.appendChild(texte);
 
     id(element).appendChild(bloc);
+
+
+}
+function actualiserProfil() {
+    id("utilisateurConnecte").textContent =
+        "Connecté en tant que : " + pseudo;
+
+    id("texteProfil").textContent =
+        "Ton pseudo actuel est : " + pseudo;
 }
 
 /* UTILISATEUR */
@@ -476,40 +485,66 @@ async function connecterPseudo() {
     const nouveauPseudo = id("pseudoInput").value.trim();
 
     if (!nouveauPseudo) {
-        afficherErreur("erreurConnexion", "Entre un pseudo.");
-        return;
-    }
-
-    const resultat = await base
-        .from("utilisateurs")
-        .insert({
-            pseudo: nouveauPseudo
-        });
-
-    if (resultat.error && resultat.error.code !== "23505") {
         afficherErreur(
             "erreurConnexion",
-            "Erreur Supabase :\n" +
-            "Message : " + resultat.error.message + "\n" +
-            "Code : " + resultat.error.code + "\n" +
-            "Détails : " + (resultat.error.details || "Aucun") + "\n" +
-            "Conseil : " + (resultat.error.hint || "Aucun")
+            "Entre un pseudo."
         );
-
         return;
     }
 
-    pseudo = nouveauPseudo;
+    afficherErreur(
+        "erreurConnexion",
+        "Connexion en cours..."
+    );
 
-    localStorage.setItem("minichat_pseudo", pseudo);
+    try {
+        const resultat = await base
+            .from("utilisateurs")
+            .insert({
+                pseudo: nouveauPseudo
+            });
 
-    id("connexion").style.display = "none";
+        if (resultat.error && resultat.error.code !== "23505") {
+            afficherErreur(
+                "erreurConnexion",
+                "Erreur Supabase : " +
+                resultat.error.message +
+                "\nCode : " +
+                resultat.error.code +
+                "\nDétails : " +
+                (resultat.error.details || "Aucun")
+            );
+            return;
+        }
 
-    actualiserProfil();
+        pseudo = nouveauPseudo;
 
-    chargerMessagesPublics();
-    chargerGroupes();
+        localStorage.setItem(
+            "minichat_pseudo",
+            pseudo
+        );
+
+        id("connexion").style.display = "none";
+
+        actualiserProfil();
+
+        await chargerMessagesPublics();
+        await chargerGroupes();
+
+    } catch (erreur) {
+        afficherErreur(
+            "erreurConnexion",
+            "Erreur de connexion : " +
+            erreur.message
+        );
+    }
 }
+
+id("boutonConnexion").addEventListener(
+    "click",
+    connecterPseudo
+);
+
 /* DISCUSSION PUBLIQUE */
 
 let dernierContenuPublic = "";
