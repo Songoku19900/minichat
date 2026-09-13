@@ -166,6 +166,12 @@ button:hover{
     white-space:pre-wrap;
 }
 
+.succes{
+    color:#15803d;
+    margin-top:8px;
+    white-space:pre-wrap;
+}
+
 .liste-groupes{
     display:flex;
     gap:8px;
@@ -199,6 +205,14 @@ button:hover{
     padding:25px;
     width:100%;
     max-width:410px;
+}
+
+.boite-connexion h2{
+    margin-top:0;
+}
+
+.boite-connexion p{
+    line-height:1.5;
 }
 
 @media(max-width:650px){
@@ -237,22 +251,21 @@ button:hover{
 
 <body>
 
+<!-- CONNEXION SANS MOT DE PASSE -->
+
 <div id="connexion">
     <div class="boite-connexion">
         <h2>💬 Bienvenue sur MiniChat</h2>
-        <p>Crée un compte ou connecte-toi.</p>
+
+        <p>
+            Entre ton adresse e-mail et ton pseudo.
+            Tu recevras un lien de connexion.
+        </p>
 
         <input
             type="email"
             id="emailInput"
             placeholder="Ton adresse e-mail"
-            style="width:100%;margin-top:10px"
-        >
-
-        <input
-            type="password"
-            id="motDePasseInput"
-            placeholder="Ton mot de passe"
             style="width:100%;margin-top:10px"
         >
 
@@ -264,17 +277,18 @@ button:hover{
             style="width:100%;margin-top:10px"
         >
 
-        <button id="boutonInscription" style="width:100%;margin-top:10px">
-            Créer un compte
-        </button>
-
-        <button id="boutonConnexion" style="width:100%;margin-top:10px">
-            Se connecter
+        <button
+            id="boutonConnexion"
+            style="width:100%;margin-top:10px"
+        >
+            Recevoir le lien de connexion
         </button>
 
         <div id="erreurConnexion" class="erreur"></div>
     </div>
 </div>
+
+<!-- APPLICATION -->
 
 <div class="application">
 
@@ -305,7 +319,10 @@ button:hover{
             <div id="utilisateurConnecte"></div>
         </header>
 
+        <!-- DISCUSSION PUBLIQUE -->
+
         <section id="public" class="page actif">
+
             <div id="messagesPublics" class="messages"></div>
 
             <form id="formulairePublic">
@@ -314,11 +331,14 @@ button:hover{
                     maxlength="500"
                     placeholder="Écris un message public..."
                 >
+
                 <button>Envoyer</button>
             </form>
 
             <div id="erreurPublic" class="erreur"></div>
         </section>
+
+        <!-- MESSAGES PRIVÉS -->
 
         <section id="prive" class="page">
 
@@ -346,11 +366,14 @@ button:hover{
                     maxlength="500"
                     placeholder="Écris un message privé..."
                 >
+
                 <button>Envoyer</button>
             </form>
 
             <div id="erreurPrive" class="erreur"></div>
         </section>
+
+        <!-- GROUPES -->
 
         <section id="groupes" class="page">
 
@@ -380,15 +403,21 @@ button:hover{
                     maxlength="500"
                     placeholder="Écris dans le groupe..."
                 >
+
                 <button>Envoyer</button>
             </form>
 
             <div id="erreurGroupe" class="erreur"></div>
         </section>
 
+        <!-- PROFIL -->
+
         <section id="profil" class="page">
+
             <h3>Mon profil</h3>
+
             <p id="texteProfil"></p>
+
             <p>Ton pseudo est enregistré dans Supabase.</p>
 
             <button id="changerPseudo" class="bouton-secondaire">
@@ -400,15 +429,20 @@ button:hover{
 </div>
 
 <script>
+/* CONFIGURATION SUPABASE */
+
 const SUPABASE_URL =
     "https://yntyarldepwjlbbeobja.supabase.co";
 
 const SUPABASE_KEY =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InludHlhcmxkZXB3amxiYmVvYmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMjA4MDYsImV4cCI6MjEwNDc5NjgwNn0.hfE2Vb3aYqI5TAZ7jc3fxXXOecmIC_nud98NECGw2u0";
+
 const base = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
+
+/* VARIABLES */
 
 let pseudo = "";
 let utilisateurAuth = null;
@@ -416,27 +450,36 @@ let conversationActuelle = null;
 let destinataireActuel = "";
 let groupeActuel = null;
 
-function id(nom) {
+/* OUTILS */
+
+function id(nom){
     return document.getElementById(nom);
 }
 
-function afficherErreur(element, message = "") {
+function afficherErreur(element, message = ""){
     id(element).textContent = message;
+    id(element).className = "erreur";
 }
 
-function verifierConnexion(element) {
-    if (!utilisateurAuth) {
+function afficherSucces(element, message = ""){
+    id(element).textContent = message;
+    id(element).className = "succes";
+}
+
+function verifierConnexion(element){
+    if(!utilisateurAuth){
         afficherErreur(
             element,
             "Tu dois être connecté pour effectuer cette action."
         );
+
         return false;
     }
 
     return true;
 }
 
-function actualiserProfil() {
+function actualiserProfil(){
     id("utilisateurConnecte").textContent =
         "Connecté en tant que : " + pseudo;
 
@@ -447,7 +490,9 @@ function actualiserProfil() {
 /* NAVIGATION */
 
 document.querySelectorAll(".navigation").forEach(bouton => {
+
     bouton.addEventListener("click", () => {
+
         const page = bouton.dataset.page;
 
         document.querySelectorAll(".page").forEach(section => {
@@ -458,7 +503,10 @@ document.querySelectorAll(".navigation").forEach(bouton => {
         });
 
         document.querySelectorAll(".navigation").forEach(b => {
-            b.classList.toggle("actif", b === bouton);
+            b.classList.toggle(
+                "actif",
+                b === bouton
+            );
         });
 
         const titres = {
@@ -470,27 +518,32 @@ document.querySelectorAll(".navigation").forEach(bouton => {
 
         id("titrePage").textContent = titres[page];
 
-        if (page === "public") {
+        if(page === "public"){
             chargerMessagesPublics();
         }
 
-        if (page === "groupes") {
+        if(page === "groupes"){
             chargerGroupes();
+        }
+
+        if(page === "prive" && conversationActuelle){
+            chargerMessagesPrives();
         }
     });
 });
 
-/* AFFICHAGE DES MESSAGES */
+/* AFFICHER UN MESSAGE */
 
-function afficherMessage(element, message) {
+function afficherMessage(element, message){
+
     const bloc = document.createElement("div");
 
     bloc.className = "message";
 
-    if (
+    if(
         utilisateurAuth &&
         message.auteur_auth_id === utilisateurAuth.id
-    ) {
+    ){
         bloc.classList.add("moi");
     }
 
@@ -502,6 +555,7 @@ function afficherMessage(element, message) {
         new Date(message.created_at).toLocaleString("fr-FR");
 
     const texte = document.createElement("div");
+
     texte.textContent = message.text;
 
     bloc.appendChild(auteur);
@@ -510,272 +564,315 @@ function afficherMessage(element, message) {
     id(element).appendChild(bloc);
 }
 
-/* INSCRIPTION */
+/* CONNEXION SANS MOT DE PASSE */
 
-async function inscrireCompte() {
+async function connecterCompte(){
+
     const email = id("emailInput").value.trim();
-    const motDePasse = id("motDePasseInput").value;
     const nouveauPseudo = id("pseudoInput").value.trim();
 
     afficherErreur("erreurConnexion");
 
-    if (!email || !motDePasse || !nouveauPseudo) {
+    if(!email || !nouveauPseudo){
         afficherErreur(
             "erreurConnexion",
-            "Remplis tous les champs."
+            "Entre ton adresse e-mail et ton pseudo."
         );
+
         return;
     }
 
-    if (motDePasse.length < 6) {
+    if(nouveauPseudo.length < 2){
         afficherErreur(
             "erreurConnexion",
-            "Le mot de passe doit contenir au moins 6 caractères."
+            "Ton pseudo doit contenir au moins 2 caractères."
         );
+
         return;
     }
 
-    const auth = await base.auth.signUp({
+    localStorage.setItem(
+        "pseudoEnAttente",
+        nouveauPseudo
+    );
+
+    const resultat = await base.auth.signInWithOtp({
         email: email,
-        password: motDePasse
+
+        options: {
+            emailRedirectTo: window.location.href
+        }
     });
 
-    if (auth.error) {
-        afficherErreur("erreurConnexion", auth.error.message);
-        return;
-    }
-
-    if (!auth.data.user) {
+    if(resultat.error){
         afficherErreur(
             "erreurConnexion",
-            "Vérifie ton adresse e-mail."
+            resultat.error.message
         );
+
         return;
     }
 
-    const profil = await base
-        .from("utilisateurs")
-        .insert({
-            pseudo: nouveauPseudo,
-            auth_id: auth.data.user.id
-        });
-
-    if (profil.error) {
-        afficherErreur(
-            "erreurConnexion",
-            "Ce pseudo est peut-être déjà utilisé."
-        );
-        return;
-    }
-
-    utilisateurAuth = auth.data.user;
-    pseudo = nouveauPseudo;
-
-    id("connexion").style.display = "none";
-
-    actualiserProfil();
-    await chargerMessagesPublics();
-    await chargerGroupes();
+    afficherSucces(
+        "erreurConnexion",
+        "Un lien de connexion vient d'être envoyé à ton adresse e-mail."
+    );
 }
 
-/* CONNEXION */
+/* CHARGER LE PROFIL APRÈS CONNEXION */
 
-async function connecterCompte() {
-    const email = id("emailInput").value.trim();
-    const motDePasse = id("motDePasseInput").value;
+async function chargerProfilApresConnexion(){
 
-    afficherErreur("erreurConnexion");
-
-    if (!email || !motDePasse) {
-        afficherErreur(
-            "erreurConnexion",
-            "Entre ton e-mail et ton mot de passe."
-        );
-        return;
+    if(!utilisateurAuth){
+        return false;
     }
 
-    const resultat = await base.auth.signInWithPassword({
-        email: email,
-        password: motDePasse
-    });
-
-    if (resultat.error) {
-        afficherErreur(
-            "erreurConnexion",
-            "E-mail ou mot de passe incorrect."
-        );
-        return;
-    }
-
-    const profil = await base
+    let profil = await base
         .from("utilisateurs")
-        .select("pseudo, auth_id")
-        .eq("auth_id", resultat.data.user.id)
-        .single();
+        .select("pseudo,auth_id")
+        .eq("auth_id", utilisateurAuth.id)
+        .maybeSingle();
 
-    if (profil.error || !profil.data) {
+    if(profil.error){
+        afficherErreur(
+            "erreurConnexion",
+            profil.error.message
+        );
+
+        return false;
+    }
+
+    /*
+       Si aucun profil n'existe encore,
+       on utilise le pseudo enregistré avant l'envoi du lien.
+    */
+
+    if(!profil.data){
+
+        const pseudoEnAttente =
+            localStorage.getItem("pseudoEnAttente");
+
+        if(!pseudoEnAttente){
+
+            afficherErreur(
+                "erreurConnexion",
+                "Aucun pseudo trouvé. Recommence la connexion."
+            );
+
+            return false;
+        }
+
+        const creationProfil = await base
+            .from("utilisateurs")
+            .insert({
+                pseudo: pseudoEnAttente,
+                auth_id: utilisateurAuth.id
+            })
+            .select("pseudo,auth_id")
+            .single();
+
+        if(creationProfil.error){
+
+            afficherErreur(
+                "erreurConnexion",
+                "Impossible de créer ton profil : " +
+                creationProfil.error.message
+            );
+
+            return false;
+        }
+
+        profil = creationProfil;
+
+        localStorage.removeItem("pseudoEnAttente");
+    }
+
+    if(profil.error || !profil.data){
+
         afficherErreur(
             "erreurConnexion",
             "Profil MiniChat introuvable."
         );
-        return;
+
+        return false;
     }
 
-    utilisateurAuth = resultat.data.user;
     pseudo = profil.data.pseudo;
 
-    id("connexion").style.display = "none";
-
-    actualiserProfil();
-    await chargerMessagesPublics();
-    await chargerGroupes();
+    return true;
 }
 
 /* MESSAGES PUBLICS */
 
-async function chargerMessagesPublics() {
+async function chargerMessagesPublics(){
+
     const resultat = await base
         .from("messages")
         .select("id,pseudo,text,created_at,auteur_auth_id")
         .order("created_at", {
-            ascending: true
+            ascending:true
         });
 
-    if (resultat.error) {
+    if(resultat.error){
+
         afficherErreur(
             "erreurPublic",
             resultat.error.message
         );
+
         return;
     }
 
     const zone = id("messagesPublics");
 
     const etaitEnBas =
-        zone.scrollHeight - zone.scrollTop - zone.clientHeight < 30;
+        zone.scrollHeight -
+        zone.scrollTop -
+        zone.clientHeight < 30;
 
     zone.replaceChildren();
 
     resultat.data.forEach(message => {
-        afficherMessage("messagesPublics", message);
+        afficherMessage(
+            "messagesPublics",
+            message
+        );
     });
 
-    if (etaitEnBas) {
+    if(etaitEnBas){
         zone.scrollTop = zone.scrollHeight;
     }
 }
 
-id("formulairePublic").addEventListener("submit", async event => {
-    event.preventDefault();
+id("formulairePublic").addEventListener(
+    "submit",
+    async event => {
 
-    if (!verifierConnexion("erreurPublic")) {
-        return;
+        event.preventDefault();
+
+        if(!verifierConnexion("erreurPublic")){
+            return;
+        }
+
+        const texte = id("textePublic").value.trim();
+
+        if(!texte){
+            return;
+        }
+
+        const resultat = await base
+            .from("messages")
+            .insert({
+                pseudo:pseudo,
+                text:texte,
+                auteur_auth_id:utilisateurAuth.id
+            });
+
+        if(resultat.error){
+
+            afficherErreur(
+                "erreurPublic",
+                resultat.error.message
+            );
+
+            return;
+        }
+
+        id("textePublic").value = "";
+
+        await chargerMessagesPublics();
     }
-
-    const texte = id("textePublic").value.trim();
-
-    if (!texte) {
-        return;
-    }
-
-    const resultat = await base
-        .from("messages")
-        .insert({
-            pseudo: pseudo,
-            text: texte,
-            auteur_auth_id: utilisateurAuth.id
-        });
-
-    if (resultat.error) {
-        afficherErreur(
-            "erreurPublic",
-            resultat.error.message
-        );
-        return;
-    }
-
-    id("textePublic").value = "";
-    await chargerMessagesPublics();
-});
+);
 
 /* MESSAGES PRIVÉS */
 
-async function trouverConversation(destinataire) {
+async function trouverConversation(destinataire){
+
     const recherche1 = await base
         .from("conversations_privees")
         .select("id,utilisateur1,utilisateur2")
-        .eq("utilisateur1", pseudo)
-        .eq("utilisateur2", destinataire)
+        .eq("utilisateur1",pseudo)
+        .eq("utilisateur2",destinataire)
         .limit(1);
 
-    if (recherche1.error) {
+    if(recherche1.error){
         throw recherche1.error;
     }
 
-    if (recherche1.data.length > 0) {
+    if(recherche1.data.length > 0){
         return recherche1.data[0];
     }
 
     const recherche2 = await base
         .from("conversations_privees")
         .select("id,utilisateur1,utilisateur2")
-        .eq("utilisateur1", destinataire)
-        .eq("utilisateur2", pseudo)
+        .eq("utilisateur1",destinataire)
+        .eq("utilisateur2",pseudo)
         .limit(1);
 
-    if (recherche2.error) {
+    if(recherche2.error){
         throw recherche2.error;
     }
 
-    if (recherche2.data.length > 0) {
+    if(recherche2.data.length > 0){
         return recherche2.data[0];
     }
 
     return null;
 }
 
-async function ouvrirLaConversation() {
-    if (!verifierConnexion("erreurPrive")) {
+async function ouvrirLaConversation(){
+
+    if(!verifierConnexion("erreurPrive")){
         return;
     }
 
-    const destinataire = id("pseudoDestinataire").value.trim();
+    const destinataire =
+        id("pseudoDestinataire").value.trim();
 
     afficherErreur("erreurPrive");
 
-    if (!destinataire) {
+    if(!destinataire){
+
         afficherErreur(
             "erreurPrive",
             "Entre le pseudo du destinataire."
         );
+
         return;
     }
 
-    if (
-        destinataire.toLowerCase() === pseudo.toLowerCase()
-    ) {
+    if(
+        destinataire.toLowerCase() ===
+        pseudo.toLowerCase()
+    ){
+
         afficherErreur(
             "erreurPrive",
             "Tu ne peux pas discuter avec toi-même."
         );
+
         return;
     }
 
-    try {
-        let conversation = await trouverConversation(destinataire);
+    try{
 
-        if (!conversation) {
+        let conversation =
+            await trouverConversation(destinataire);
+
+        if(!conversation){
+
             const creation = await base
                 .from("conversations_privees")
                 .insert({
-                    utilisateur1: pseudo,
-                    utilisateur2: destinataire,
-                    utilisateur1_auth_id: utilisateurAuth.id
+                    utilisateur1:pseudo,
+                    utilisateur2:destinataire,
+                    utilisateur1_auth_id:utilisateurAuth.id
                 })
                 .select("id,utilisateur1,utilisateur2")
                 .single();
 
-            if (creation.error) {
+            if(creation.error){
                 throw creation.error;
             }
 
@@ -790,7 +887,8 @@ async function ouvrirLaConversation() {
 
         await chargerMessagesPrives();
 
-    } catch (erreur) {
+    }catch(erreur){
+
         afficherErreur(
             "erreurPrive",
             "Erreur : " + erreur.message
@@ -806,178 +904,213 @@ id("ouvrirConversation").addEventListener(
 id("pseudoDestinataire").addEventListener(
     "keydown",
     event => {
-        if (event.key === "Enter") {
+
+        if(event.key === "Enter"){
+
             event.preventDefault();
+
             ouvrirLaConversation();
         }
     }
 );
 
-async function chargerMessagesPrives() {
-    if (!conversationActuelle) {
+async function chargerMessagesPrives(){
+
+    if(!conversationActuelle){
         return;
     }
 
     const resultat = await base
         .from("messages_prives")
         .select("pseudo,text,created_at,auteur_auth_id")
-        .eq("conversation_id", conversationActuelle)
+        .eq("conversation_id",conversationActuelle)
         .order("created_at", {
-            ascending: true
+            ascending:true
         });
 
-    if (resultat.error) {
+    if(resultat.error){
+
         afficherErreur(
             "erreurPrive",
             resultat.error.message
         );
+
         return;
     }
 
     id("messagesPrives").replaceChildren();
 
     resultat.data.forEach(message => {
-        afficherMessage("messagesPrives", message);
+
+        afficherMessage(
+            "messagesPrives",
+            message
+        );
     });
 
     id("messagesPrives").scrollTop =
         id("messagesPrives").scrollHeight;
 }
 
-id("formulairePrive").addEventListener("submit", async event => {
-    event.preventDefault();
+id("formulairePrive").addEventListener(
+    "submit",
+    async event => {
 
-    if (!verifierConnexion("erreurPrive")) {
-        return;
+        event.preventDefault();
+
+        if(!verifierConnexion("erreurPrive")){
+            return;
+        }
+
+        const texte = id("textePrive").value.trim();
+
+        if(!texte){
+            return;
+        }
+
+        if(!conversationActuelle){
+
+            afficherErreur(
+                "erreurPrive",
+                "Ouvre d'abord une conversation."
+            );
+
+            return;
+        }
+
+        const resultat = await base
+            .from("messages_prives")
+            .insert({
+                conversation_id:conversationActuelle,
+                pseudo:pseudo,
+                text:texte,
+                auteur_auth_id:utilisateurAuth.id
+            });
+
+        if(resultat.error){
+
+            afficherErreur(
+                "erreurPrive",
+                resultat.error.message
+            );
+
+            return;
+        }
+
+        id("textePrive").value = "";
+
+        await chargerMessagesPrives();
     }
-
-    const texte = id("textePrive").value.trim();
-
-    if (!texte) {
-        return;
-    }
-
-    if (!conversationActuelle) {
-        afficherErreur(
-            "erreurPrive",
-            "Ouvre d'abord une conversation."
-        );
-        return;
-    }
-
-    const resultat = await base
-        .from("messages_prives")
-        .insert({
-            conversation_id: conversationActuelle,
-            pseudo: pseudo,
-            text: texte,
-            auteur_auth_id: utilisateurAuth.id
-        });
-
-    if (resultat.error) {
-        afficherErreur(
-            "erreurPrive",
-            resultat.error.message
-        );
-        return;
-    }
-
-    id("textePrive").value = "";
-    await chargerMessagesPrives();
-});
+);
 
 /* GROUPES */
 
-async function chargerGroupes() {
+async function chargerGroupes(){
+
     const resultat = await base
         .from("groupes")
         .select("id,nom,createur,createur_auth_id")
         .order("created_at", {
-            ascending: true
+            ascending:true
         });
 
-    if (resultat.error) {
+    if(resultat.error){
+
         afficherErreur(
             "erreurGroupe",
             resultat.error.message
         );
+
         return;
     }
 
     id("listeGroupes").replaceChildren();
 
     resultat.data.forEach(groupe => {
+
         const bouton = document.createElement("button");
 
         bouton.className = "groupe-bouton";
 
-        if (groupe.id === groupeActuel) {
+        if(groupe.id === groupeActuel){
             bouton.classList.add("selectionne");
         }
 
         bouton.textContent = "👥 " + groupe.nom;
 
-        bouton.addEventListener("click", () => {
-            choisirGroupe(groupe);
-        });
+        bouton.addEventListener(
+            "click",
+            () => choisirGroupe(groupe)
+        );
 
         id("listeGroupes").appendChild(bouton);
     });
 }
 
-id("creerGroupe").addEventListener("click", async () => {
-    if (!verifierConnexion("erreurGroupe")) {
-        return;
+id("creerGroupe").addEventListener(
+    "click",
+    async () => {
+
+        if(!verifierConnexion("erreurGroupe")){
+            return;
+        }
+
+        const nom = id("nomGroupe").value.trim();
+
+        if(!nom){
+            return;
+        }
+
+        const resultat = await base
+            .from("groupes")
+            .insert({
+                nom:nom,
+                createur:pseudo,
+                createur_auth_id:utilisateurAuth.id
+            })
+            .select()
+            .single();
+
+        if(resultat.error){
+
+            afficherErreur(
+                "erreurGroupe",
+                resultat.error.message
+            );
+
+            return;
+        }
+
+        const ajoutMembre = await base
+            .from("membres_groupes")
+            .insert({
+                groupe_id:resultat.data.id,
+                pseudo:pseudo,
+                membre_auth_id:utilisateurAuth.id
+            });
+
+        if(ajoutMembre.error){
+
+            afficherErreur(
+                "erreurGroupe",
+                ajoutMembre.error.message
+            );
+
+            return;
+        }
+
+        id("nomGroupe").value = "";
+
+        groupeActuel = resultat.data.id;
+
+        await chargerGroupes();
+
+        await choisirGroupe(resultat.data);
     }
+);
 
-    const nom = id("nomGroupe").value.trim();
+async function choisirGroupe(groupe){
 
-    if (!nom) {
-        return;
-    }
-
-    const resultat = await base
-        .from("groupes")
-        .insert({
-            nom: nom,
-            createur: pseudo,
-            createur_auth_id: utilisateurAuth.id
-        })
-        .select()
-        .single();
-
-    if (resultat.error) {
-        afficherErreur(
-            "erreurGroupe",
-            resultat.error.message
-        );
-        return;
-    }
-
-    const ajoutMembre = await base
-        .from("membres_groupes")
-        .insert({
-            groupe_id: resultat.data.id,
-            pseudo: pseudo,
-            membre_auth_id: utilisateurAuth.id
-        });
-
-    if (ajoutMembre.error) {
-        afficherErreur(
-            "erreurGroupe",
-            ajoutMembre.error.message
-        );
-        return;
-    }
-
-    id("nomGroupe").value = "";
-    groupeActuel = resultat.data.id;
-
-    await chargerGroupes();
-    await choisirGroupe(resultat.data);
-});
-
-async function choisirGroupe(groupe) {
     groupeActuel = groupe.id;
 
     id("informationGroupe").textContent =
@@ -987,180 +1120,266 @@ async function choisirGroupe(groupe) {
         groupe.createur;
 
     await chargerMessagesGroupes();
+
     await chargerGroupes();
 }
 
-async function chargerMessagesGroupes() {
-    if (!groupeActuel) {
+async function chargerMessagesGroupes(){
+
+    if(!groupeActuel){
         return;
     }
 
     const resultat = await base
         .from("messages_groupes")
         .select("pseudo,text,created_at,auteur_auth_id")
-        .eq("groupe_id", groupeActuel)
+        .eq("groupe_id",groupeActuel)
         .order("created_at", {
-            ascending: true
+            ascending:true
         });
 
-    if (resultat.error) {
+    if(resultat.error){
+
         afficherErreur(
             "erreurGroupe",
             resultat.error.message
         );
+
         return;
     }
 
     id("messagesGroupes").replaceChildren();
 
     resultat.data.forEach(message => {
-        afficherMessage("messagesGroupes", message);
+
+        afficherMessage(
+            "messagesGroupes",
+            message
+        );
     });
 
     id("messagesGroupes").scrollTop =
         id("messagesGroupes").scrollHeight;
 }
 
-id("formulaireGroupe").addEventListener("submit", async event => {
-    event.preventDefault();
+id("formulaireGroupe").addEventListener(
+    "submit",
+    async event => {
 
-    if (!verifierConnexion("erreurGroupe")) {
-        return;
+        event.preventDefault();
+
+        if(!verifierConnexion("erreurGroupe")){
+            return;
+        }
+
+        const texte = id("texteGroupe").value.trim();
+
+        if(!texte){
+            return;
+        }
+
+        if(!groupeActuel){
+
+            afficherErreur(
+                "erreurGroupe",
+                "Sélectionne d'abord un groupe."
+            );
+
+            return;
+        }
+
+        const resultat = await base
+            .from("messages_groupes")
+            .insert({
+                groupe_id:groupeActuel,
+                pseudo:pseudo,
+                text:texte,
+                auteur_auth_id:utilisateurAuth.id
+            });
+
+        if(resultat.error){
+
+            afficherErreur(
+                "erreurGroupe",
+                resultat.error.message
+            );
+
+            return;
+        }
+
+        id("texteGroupe").value = "";
+
+        await chargerMessagesGroupes();
     }
-
-    const texte = id("texteGroupe").value.trim();
-
-    if (!texte) {
-        return;
-    }
-
-    if (!groupeActuel) {
-        afficherErreur(
-            "erreurGroupe",
-            "Sélectionne d'abord un groupe."
-        );
-        return;
-    }
-
-    const resultat = await base
-        .from("messages_groupes")
-        .insert({
-            groupe_id: groupeActuel,
-            pseudo: pseudo,
-            text: texte,
-            auteur_auth_id: utilisateurAuth.id
-        });
-
-    if (resultat.error) {
-        afficherErreur(
-            "erreurGroupe",
-            resultat.error.message
-        );
-        return;
-    }
-
-    id("texteGroupe").value = "";
-    await chargerMessagesGroupes();
-});
+);
 
 /* CHANGER DE PSEUDO */
 
-id("changerPseudo").addEventListener("click", async () => {
-    if (!verifierConnexion("erreurConnexion")) {
-        return;
-    }
-
-    const nouveauPseudo = prompt(
-        "Nouveau pseudo :",
-        pseudo
-    );
-
-    if (!nouveauPseudo || !nouveauPseudo.trim()) {
-        return;
-    }
-
-    const propre = nouveauPseudo.trim();
-
-    const resultat = await base
-        .from("utilisateurs")
-        .update({
-            pseudo: propre
-        })
-        .eq("auth_id", utilisateurAuth.id);
-
-    if (resultat.error) {
-        alert(resultat.error.message);
-        return;
-    }
-
-    pseudo = propre;
-    actualiserProfil();
-});
-
-/* BOUTONS DE CONNEXION */
-
-id("boutonInscription").addEventListener(
+id("changerPseudo").addEventListener(
     "click",
-    inscrireCompte
-);
+    async () => {
 
-id("boutonConnexion").addEventListener(
-    "click",
-    connecterCompte
-);
-
-id("motDePasseInput").addEventListener(
-    "keydown",
-    event => {
-        if (event.key === "Enter") {
-            connecterCompte();
+        if(!verifierConnexion("erreurConnexion")){
+            return;
         }
+
+        const nouveauPseudo = prompt(
+            "Nouveau pseudo :",
+            pseudo
+        );
+
+        if(
+            !nouveauPseudo ||
+            !nouveauPseudo.trim()
+        ){
+            return;
+        }
+
+        const propre = nouveauPseudo.trim();
+
+        const resultat = await base
+            .from("utilisateurs")
+            .update({
+                pseudo:propre
+            })
+            .eq("auth_id",utilisateurAuth.id);
+
+        if(resultat.error){
+
+            alert(resultat.error.message);
+
+            return;
+        }
+
+        pseudo = propre;
+
+        actualiserProfil();
     }
 );
 
 /* DÉMARRAGE */
 
-async function demarrerMiniChat() {
-    const session = await base.auth.getSession();
+async function demarrerMiniChat(){
 
-    if (!session.data.session) {
+    const resultatSession =
+        await base.auth.getSession();
+
+    const session =
+        resultatSession.data.session;
+
+    if(!session){
+
         id("connexion").style.display = "flex";
+
         return;
     }
 
-    const profil = await base
-        .from("utilisateurs")
-        .select("pseudo,auth_id")
-        .eq("auth_id", session.data.session.user.id)
-        .single();
+    utilisateurAuth = session.user;
 
-    if (profil.error || !profil.data) {
+    const profilCorrect =
+        await chargerProfilApresConnexion();
+
+    if(!profilCorrect){
+
         id("connexion").style.display = "flex";
+
         return;
     }
-
-    utilisateurAuth = session.data.session.user;
-    pseudo = profil.data.pseudo;
 
     id("connexion").style.display = "none";
 
     actualiserProfil();
 
     await chargerMessagesPublics();
+
     await chargerGroupes();
 }
 
+/* ÉCOUTER LES CHANGEMENTS DE CONNEXION */
+
+base.auth.onAuthStateChange(
+    async (event, session) => {
+
+        if(
+            event === "SIGNED_IN" &&
+            session
+        ){
+
+            utilisateurAuth = session.user;
+
+            const profilCorrect =
+                await chargerProfilApresConnexion();
+
+            if(profilCorrect){
+
+                id("connexion").style.display = "none";
+
+                actualiserProfil();
+
+                await chargerMessagesPublics();
+
+                await chargerGroupes();
+            }
+        }
+
+        if(event === "SIGNED_OUT"){
+
+            utilisateurAuth = null;
+            pseudo = "";
+            conversationActuelle = null;
+            destinataireActuel = "";
+            groupeActuel = null;
+
+            id("connexion").style.display = "flex";
+        }
+    }
+);
+
+/* BOUTON DE CONNEXION */
+
+id("boutonConnexion").addEventListener(
+    "click",
+    connecterCompte
+);
+
+id("emailInput").addEventListener(
+    "keydown",
+    event => {
+
+        if(event.key === "Enter"){
+            connecterCompte();
+        }
+    }
+);
+
+id("pseudoInput").addEventListener(
+    "keydown",
+    event => {
+
+        if(event.key === "Enter"){
+            connecterCompte();
+        }
+    }
+);
+
+/* ACTUALISATION AUTOMATIQUE */
+
 setInterval(() => {
-    if (conversationActuelle) {
+
+    if(conversationActuelle){
         chargerMessagesPrives();
     }
 
-    if (groupeActuel) {
+    if(groupeActuel){
         chargerMessagesGroupes();
     }
-}, 2000);
+
+},2000);
+
+/* LANCEMENT */
 
 demarrerMiniChat();
+
 </script>
 
 </body>
