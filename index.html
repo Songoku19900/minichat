@@ -8,230 +8,228 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-* {
-    box-sizing: border-box;
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#eef2ff;
+    color:#1e293b;
 }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #eef2ff;
-    color: #1e293b;
+.application{
+    display:flex;
+    max-width:1150px;
+    height:92vh;
+    margin:4vh auto;
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 10px 35px #0002;
 }
 
-.application {
-    display: flex;
-    max-width: 1150px;
-    height: 92vh;
-    margin: 4vh auto;
-    background: white;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 10px 35px #0002;
+.menu{
+    width:240px;
+    background:#312e81;
+    color:white;
+    padding:20px;
 }
 
-.menu {
-    width: 240px;
-    background: #312e81;
-    color: white;
-    padding: 20px;
+.menu h1{
+    margin-top:0;
+    margin-bottom:25px;
 }
 
-.menu h1 {
-    margin-top: 0;
-    margin-bottom: 25px;
-}
-
-.menu button {
-    display: block;
-    width: 100%;
-    margin: 10px 0;
-    padding: 13px;
-    border: none;
-    border-radius: 10px;
-    background: #4f46e5;
-    color: white;
-    text-align: left;
-    cursor: pointer;
+.menu button{
+    display:block;
+    width:100%;
+    margin:10px 0;
+    padding:13px;
+    border:none;
+    border-radius:10px;
+    background:#4f46e5;
+    color:white;
+    text-align:left;
+    cursor:pointer;
 }
 
 .menu button:hover,
-.menu button.actif {
-    background: #818cf8;
+.menu button.actif{
+    background:#818cf8;
 }
 
-.contenu {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+.contenu{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
 }
 
-header {
-    background: #4f46e5;
-    color: white;
-    padding: 18px;
+header{
+    background:#4f46e5;
+    color:white;
+    padding:18px;
 }
 
-header h2 {
-    margin: 0 0 5px;
+header h2{
+    margin:0 0 5px;
 }
 
-.page {
-    display: none;
-    flex: 1;
-    min-height: 0;
-    flex-direction: column;
-    padding: 20px;
+.page{
+    display:none;
+    flex:1;
+    min-height:0;
+    flex-direction:column;
+    padding:20px;
 }
 
-.page.actif {
-    display: flex;
+.page.actif{
+    display:flex;
 }
 
-.messages {
-    flex: 1;
-    overflow-y: auto;
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 12px;
+.messages{
+    flex:1;
+    overflow-y:auto;
+    background:#f8fafc;
+    border-radius:12px;
+    padding:12px;
 }
 
-.message {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 10px;
-    margin: 8px 0;
-    max-width: 85%;
-    overflow-wrap: anywhere;
+.message{
+    background:white;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:10px;
+    margin:8px 0;
+    max-width:85%;
+    overflow-wrap:anywhere;
 }
 
-.message.moi {
-    margin-left: auto;
-    background: #e0e7ff;
+.message.moi{
+    margin-left:auto;
+    background:#e0e7ff;
 }
 
-.message small {
-    display: block;
-    color: #64748b;
-    margin-bottom: 5px;
+.message small{
+    display:block;
+    color:#64748b;
+    margin-bottom:5px;
 }
 
 form,
-.ligne {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 12px;
+.ligne{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:12px;
 }
 
-input {
-    flex: 1;
-    min-width: 0;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 9px;
-    font: inherit;
+input{
+    flex:1;
+    min-width:0;
+    padding:12px;
+    border:1px solid #cbd5e1;
+    border-radius:9px;
+    font:inherit;
 }
 
-button {
-    padding: 12px;
-    border: none;
-    border-radius: 9px;
-    background: #4f46e5;
-    color: white;
-    cursor: pointer;
-    font: inherit;
+button{
+    padding:12px;
+    border:none;
+    border-radius:9px;
+    background:#4f46e5;
+    color:white;
+    cursor:pointer;
+    font:inherit;
 }
 
-button:hover {
-    filter: brightness(0.95);
+button:hover{
+    filter:brightness(.95);
 }
 
-.bouton-secondaire {
-    background: #e2e8f0;
-    color: #1e293b;
+.bouton-secondaire{
+    background:#e2e8f0;
+    color:#1e293b;
 }
 
-.information {
-    background: #fff7ed;
-    color: #9a3412;
-    padding: 10px;
-    border-radius: 10px;
-    margin: 10px 0;
+.information{
+    background:#fff7ed;
+    color:#9a3412;
+    padding:10px;
+    border-radius:10px;
+    margin:10px 0;
 }
 
-.erreur {
-    color: #b91c1c;
-    margin-top: 8px;
-    white-space: pre-wrap;
+.erreur{
+    color:#b91c1c;
+    margin-top:8px;
+    white-space:pre-wrap;
 }
 
-.liste-groupes {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
+.liste-groupes{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
 }
 
-.groupe-bouton {
-    background: #e2e8f0;
-    color: #1e293b;
+.groupe-bouton{
+    background:#e2e8f0;
+    color:#1e293b;
 }
 
-.groupe-bouton.selectionne {
-    background: #a5b4fc;
+.groupe-bouton.selectionne{
+    background:#a5b4fc;
 }
 
-#connexion {
-    position: fixed;
-    inset: 0;
-    background: #0008;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 10;
+#connexion{
+    position:fixed;
+    inset:0;
+    background:#0008;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:10;
 }
 
-.boite-connexion {
-    background: white;
-    border-radius: 16px;
-    padding: 25px;
-    width: 100%;
-    max-width: 410px;
+.boite-connexion{
+    background:white;
+    border-radius:16px;
+    padding:25px;
+    width:100%;
+    max-width:410px;
 }
 
-@media (max-width: 650px) {
-    .application {
-        height: 100vh;
-        margin: 0;
-        border-radius: 0;
+@media(max-width:650px){
+    .application{
+        height:100vh;
+        margin:0;
+        border-radius:0;
     }
 
-    .menu {
-        width: 70px;
-        padding: 8px;
+    .menu{
+        width:70px;
+        padding:8px;
     }
 
-    .menu h1 {
-        font-size: 0;
+    .menu h1{
+        font-size:0;
     }
 
-    .menu h1::after {
-        content: "💬";
-        font-size: 25px;
+    .menu h1::after{
+        content:"💬";
+        font-size:25px;
     }
 
-    .menu button {
-        font-size: 0;
-        text-align: center;
-        padding: 14px 4px;
+    .menu button{
+        font-size:0;
+        text-align:center;
+        padding:14px 4px;
     }
 
-    .menu button::first-letter {
-        font-size: 20px;
+    .menu button::first-letter{
+        font-size:20px;
     }
 }
 </style>
@@ -239,21 +237,39 @@ button:hover {
 
 <body>
 
-<!-- CONNEXION -->
 <div id="connexion">
     <div class="boite-connexion">
         <h2>💬 Bienvenue sur MiniChat</h2>
-        <p>Choisis ton pseudo pour commencer.</p>
+        <p>Crée un compte ou connecte-toi.</p>
 
         <input
+            type="email"
+            id="emailInput"
+            placeholder="Ton adresse e-mail"
+            style="width:100%;margin-top:10px"
+        >
+
+        <input
+            type="password"
+            id="motDePasseInput"
+            placeholder="Ton mot de passe"
+            style="width:100%;margin-top:10px"
+        >
+
+        <input
+            type="text"
             id="pseudoInput"
             maxlength="25"
             placeholder="Ton pseudo"
-            style="width:100%"
+            style="width:100%;margin-top:10px"
         >
 
+        <button id="boutonInscription" style="width:100%;margin-top:10px">
+            Créer un compte
+        </button>
+
         <button id="boutonConnexion" style="width:100%;margin-top:10px">
-            Entrer dans MiniChat
+            Se connecter
         </button>
 
         <div id="erreurConnexion" class="erreur"></div>
@@ -262,7 +278,6 @@ button:hover {
 
 <div class="application">
 
-    <!-- MENU -->
     <aside class="menu">
         <h1>MiniChat</h1>
 
@@ -290,7 +305,6 @@ button:hover {
             <div id="utilisateurConnecte"></div>
         </header>
 
-        <!-- PAGE PUBLIQUE -->
         <section id="public" class="page actif">
             <div id="messagesPublics" class="messages"></div>
 
@@ -306,7 +320,6 @@ button:hover {
             <div id="erreurPublic" class="erreur"></div>
         </section>
 
-        <!-- PAGE PRIVÉE -->
         <section id="prive" class="page">
 
             <div class="ligne">
@@ -339,7 +352,6 @@ button:hover {
             <div id="erreurPrive" class="erreur"></div>
         </section>
 
-        <!-- PAGE GROUPES -->
         <section id="groupes" class="page">
 
             <div class="ligne">
@@ -374,11 +386,10 @@ button:hover {
             <div id="erreurGroupe" class="erreur"></div>
         </section>
 
-        <!-- PAGE PROFIL -->
         <section id="profil" class="page">
             <h3>Mon profil</h3>
             <p id="texteProfil"></p>
-            <p>Ton pseudo est enregistré dans ce navigateur.</p>
+            <p>Ton pseudo est enregistré dans Supabase.</p>
 
             <button id="changerPseudo" class="bouton-secondaire">
                 Changer de pseudo
@@ -389,23 +400,20 @@ button:hover {
 </div>
 
 <script>
-/* CONFIGURATION SUPABASE */
-
 const SUPABASE_URL =
     "https://yntyarldepwjlbbeobja.supabase.co";
 
 const SUPABASE_KEY =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InludHlhcmxkZXB3amxiYmVvYmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMjA4MDYsImV4cCI6MjEwNDc5NjgwNn0.hfE2Vb3aYqI5TAZ7jc3fxXXOecmIC_nud98NECGw2u0";
-
 const base = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
-/* VARIABLES */
-
-let pseudo = localStorage.getItem("minichat_pseudo") || "";
+let pseudo = "";
+let utilisateurAuth = null;
 let conversationActuelle = null;
+let destinataireActuel = "";
 let groupeActuel = null;
 
 function id(nom) {
@@ -414,6 +422,18 @@ function id(nom) {
 
 function afficherErreur(element, message = "") {
     id(element).textContent = message;
+}
+
+function verifierConnexion(element) {
+    if (!utilisateurAuth) {
+        afficherErreur(
+            element,
+            "Tu dois être connecté pour effectuer cette action."
+        );
+        return false;
+    }
+
+    return true;
 }
 
 function actualiserProfil() {
@@ -431,7 +451,10 @@ document.querySelectorAll(".navigation").forEach(bouton => {
         const page = bouton.dataset.page;
 
         document.querySelectorAll(".page").forEach(section => {
-            section.classList.toggle("actif", section.id === page);
+            section.classList.toggle(
+                "actif",
+                section.id === page
+            );
         });
 
         document.querySelectorAll(".navigation").forEach(b => {
@@ -447,8 +470,13 @@ document.querySelectorAll(".navigation").forEach(bouton => {
 
         id("titrePage").textContent = titres[page];
 
-        if (page === "public") chargerMessagesPublics();
-        if (page === "groupes") chargerGroupes();
+        if (page === "public") {
+            chargerMessagesPublics();
+        }
+
+        if (page === "groupes") {
+            chargerGroupes();
+        }
     });
 });
 
@@ -459,13 +487,17 @@ function afficherMessage(element, message) {
 
     bloc.className = "message";
 
-    if (message.pseudo === pseudo) {
+    if (
+        utilisateurAuth &&
+        message.auteur_auth_id === utilisateurAuth.id
+    ) {
         bloc.classList.add("moi");
     }
 
     const auteur = document.createElement("small");
+
     auteur.textContent =
-        message.pseudo +
+        (message.pseudo || "Utilisateur") +
         " • " +
         new Date(message.created_at).toLocaleString("fr-FR");
 
@@ -476,185 +508,202 @@ function afficherMessage(element, message) {
     bloc.appendChild(texte);
 
     id(element).appendChild(bloc);
-
-
 }
 
+/* INSCRIPTION */
 
-/* UTILISATEUR */
-
-async function connecterPseudo() {
+async function inscrireCompte() {
+    const email = id("emailInput").value.trim();
+    const motDePasse = id("motDePasseInput").value;
     const nouveauPseudo = id("pseudoInput").value.trim();
 
-    if (!nouveauPseudo) {
+    afficherErreur("erreurConnexion");
+
+    if (!email || !motDePasse || !nouveauPseudo) {
         afficherErreur(
             "erreurConnexion",
-            "Entre un pseudo."
+            "Remplis tous les champs."
         );
         return;
     }
 
-    afficherErreur(
-        "erreurConnexion",
-        "Connexion en cours..."
-    );
-
-    try {
-        const resultat = await base
-            .from("utilisateurs")
-            .insert({
-                pseudo: nouveauPseudo
-            });
-
-        if (resultat.error && resultat.error.code !== "23505") {
-            afficherErreur(
-                "erreurConnexion",
-                "Erreur Supabase : " +
-                resultat.error.message +
-                "\nCode : " +
-                resultat.error.code +
-                "\nDétails : " +
-                (resultat.error.details || "Aucun")
-            );
-            return;
-        }
-
-        pseudo = nouveauPseudo;
-
-        localStorage.setItem(
-            "minichat_pseudo",
-            pseudo
-        );
-
-        id("connexion").style.display = "none";
-
-        actualiserProfil();
-
-        await chargerMessagesPublics();
-        await chargerGroupes();
-
-    } catch (erreur) {
+    if (motDePasse.length < 6) {
         afficherErreur(
             "erreurConnexion",
-            "Erreur de connexion : " +
-            erreur.message
+            "Le mot de passe doit contenir au moins 6 caractères."
         );
+        return;
     }
+
+    const auth = await base.auth.signUp({
+        email: email,
+        password: motDePasse
+    });
+
+    if (auth.error) {
+        afficherErreur("erreurConnexion", auth.error.message);
+        return;
+    }
+
+    if (!auth.data.user) {
+        afficherErreur(
+            "erreurConnexion",
+            "Vérifie ton adresse e-mail."
+        );
+        return;
+    }
+
+    const profil = await base
+        .from("utilisateurs")
+        .insert({
+            pseudo: nouveauPseudo,
+            auth_id: auth.data.user.id
+        });
+
+    if (profil.error) {
+        afficherErreur(
+            "erreurConnexion",
+            "Ce pseudo est peut-être déjà utilisé."
+        );
+        return;
+    }
+
+    utilisateurAuth = auth.data.user;
+    pseudo = nouveauPseudo;
+
+    id("connexion").style.display = "none";
+
+    actualiserProfil();
+    await chargerMessagesPublics();
+    await chargerGroupes();
 }
 
-/* DISCUSSION PUBLIQUE */
+/* CONNEXION */
 
-let dernierContenuPublic = "";
+async function connecterCompte() {
+    const email = id("emailInput").value.trim();
+    const motDePasse = id("motDePasseInput").value;
+
+    afficherErreur("erreurConnexion");
+
+    if (!email || !motDePasse) {
+        afficherErreur(
+            "erreurConnexion",
+            "Entre ton e-mail et ton mot de passe."
+        );
+        return;
+    }
+
+    const resultat = await base.auth.signInWithPassword({
+        email: email,
+        password: motDePasse
+    });
+
+    if (resultat.error) {
+        afficherErreur(
+            "erreurConnexion",
+            "E-mail ou mot de passe incorrect."
+        );
+        return;
+    }
+
+    const profil = await base
+        .from("utilisateurs")
+        .select("pseudo, auth_id")
+        .eq("auth_id", resultat.data.user.id)
+        .single();
+
+    if (profil.error || !profil.data) {
+        afficherErreur(
+            "erreurConnexion",
+            "Profil MiniChat introuvable."
+        );
+        return;
+    }
+
+    utilisateurAuth = resultat.data.user;
+    pseudo = profil.data.pseudo;
+
+    id("connexion").style.display = "none";
+
+    actualiserProfil();
+    await chargerMessagesPublics();
+    await chargerGroupes();
+}
+
+/* MESSAGES PUBLICS */
 
 async function chargerMessagesPublics() {
     const resultat = await base
         .from("messages")
-        .select("id,pseudo,text,created_at")
-        .order("created_at", { ascending: true })
-        .limit(100);
+        .select("id,pseudo,text,created_at,auteur_auth_id")
+        .order("created_at", {
+            ascending: true
+        });
 
     if (resultat.error) {
-        afficherErreur("erreurPublic", resultat.error.message);
+        afficherErreur(
+            "erreurPublic",
+            resultat.error.message
+        );
         return;
     }
-
-    const signature = JSON.stringify(resultat.data);
-
-    // Si aucun message n'a changé, on ne reconstruit pas l'affichage
-    if (signature === dernierContenuPublic) {
-        return;
-    }
-
-    dernierContenuPublic = signature;
 
     const zone = id("messagesPublics");
-
-    const ancienScroll = zone.scrollTop;
 
     const etaitEnBas =
         zone.scrollHeight - zone.scrollTop - zone.clientHeight < 30;
 
-    const nouveauContenu =
-        document.createDocumentFragment();
+    zone.replaceChildren();
 
     resultat.data.forEach(message => {
-        const bloc = document.createElement("div");
-
-        bloc.className = "message";
-
-        if (message.pseudo === pseudo) {
-            bloc.classList.add("moi");
-        }
-
-        const auteur = document.createElement("small");
-
-        auteur.textContent =
-            message.pseudo +
-            " • " +
-            new Date(message.created_at).toLocaleString("fr-FR");
-
-        const texte = document.createElement("div");
-
-        texte.textContent = message.text;
-
-        bloc.appendChild(auteur);
-        bloc.appendChild(texte);
-
-        nouveauContenu.appendChild(bloc);
+        afficherMessage("messagesPublics", message);
     });
 
-    // Remplace tous les messages en une seule fois
-    zone.replaceChildren(nouveauContenu);
-
-    // Conserve la position de défilement
     if (etaitEnBas) {
         zone.scrollTop = zone.scrollHeight;
-    } else {
-        zone.scrollTop = ancienScroll;
     }
 }
 
-id("formulairePublic").addEventListener(
-    "submit",
-    async event => {
-        event.preventDefault();
+id("formulairePublic").addEventListener("submit", async event => {
+    event.preventDefault();
 
-        const texte = id("textePublic").value.trim();
-
-        if (!texte) {
-            return;
-        }
-
-        const resultat = await base
-            .from("messages")
-            .insert({
-                pseudo: pseudo,
-                text: texte
-            });
-
-        if (resultat.error) {
-            afficherErreur(
-                "erreurPublic",
-                resultat.error.message
-            );
-            return;
-        }
-
-        id("textePublic").value = "";
-
-        await chargerMessagesPublics();
+    if (!verifierConnexion("erreurPublic")) {
+        return;
     }
-);
+
+    const texte = id("textePublic").value.trim();
+
+    if (!texte) {
+        return;
+    }
+
+    const resultat = await base
+        .from("messages")
+        .insert({
+            pseudo: pseudo,
+            text: texte,
+            auteur_auth_id: utilisateurAuth.id
+        });
+
+    if (resultat.error) {
+        afficherErreur(
+            "erreurPublic",
+            resultat.error.message
+        );
+        return;
+    }
+
+    id("textePublic").value = "";
+    await chargerMessagesPublics();
+});
 
 /* MESSAGES PRIVÉS */
 
-let destinataireActuel = "";
-
-/* Trouver une conversation existante dans les deux sens */
 async function trouverConversation(destinataire) {
     const recherche1 = await base
         .from("conversations_privees")
-        .select("id, utilisateur1, utilisateur2")
+        .select("id,utilisateur1,utilisateur2")
         .eq("utilisateur1", pseudo)
         .eq("utilisateur2", destinataire)
         .limit(1);
@@ -669,7 +718,7 @@ async function trouverConversation(destinataire) {
 
     const recherche2 = await base
         .from("conversations_privees")
-        .select("id, utilisateur1, utilisateur2")
+        .select("id,utilisateur1,utilisateur2")
         .eq("utilisateur1", destinataire)
         .eq("utilisateur2", pseudo)
         .limit(1);
@@ -685,11 +734,14 @@ async function trouverConversation(destinataire) {
     return null;
 }
 
-/* Ouvrir une conversation */
 async function ouvrirLaConversation() {
+    if (!verifierConnexion("erreurPrive")) {
+        return;
+    }
+
     const destinataire = id("pseudoDestinataire").value.trim();
 
-    afficherErreur("erreurPrive", "");
+    afficherErreur("erreurPrive");
 
     if (!destinataire) {
         afficherErreur(
@@ -699,7 +751,9 @@ async function ouvrirLaConversation() {
         return;
     }
 
-    if (destinataire.toLowerCase() === pseudo.toLowerCase()) {
+    if (
+        destinataire.toLowerCase() === pseudo.toLowerCase()
+    ) {
         afficherErreur(
             "erreurPrive",
             "Tu ne peux pas discuter avec toi-même."
@@ -710,15 +764,15 @@ async function ouvrirLaConversation() {
     try {
         let conversation = await trouverConversation(destinataire);
 
-        /* Si la conversation n'existe pas, on la crée */
         if (!conversation) {
             const creation = await base
                 .from("conversations_privees")
                 .insert({
                     utilisateur1: pseudo,
-                    utilisateur2: destinataire
+                    utilisateur2: destinataire,
+                    utilisateur1_auth_id: utilisateurAuth.id
                 })
-                .select("id, utilisateur1, utilisateur2")
+                .select("id,utilisateur1,utilisateur2")
                 .single();
 
             if (creation.error) {
@@ -744,13 +798,11 @@ async function ouvrirLaConversation() {
     }
 }
 
-/* Bouton Ouvrir */
 id("ouvrirConversation").addEventListener(
     "click",
     ouvrirLaConversation
 );
 
-/* Appuyer sur Entrée dans le champ du destinataire */
 id("pseudoDestinataire").addEventListener(
     "keydown",
     event => {
@@ -761,7 +813,6 @@ id("pseudoDestinataire").addEventListener(
     }
 );
 
-/* Charger les messages de la conversation */
 async function chargerMessagesPrives() {
     if (!conversationActuelle) {
         return;
@@ -769,7 +820,7 @@ async function chargerMessagesPrives() {
 
     const resultat = await base
         .from("messages_prives")
-        .select("pseudo, text, created_at")
+        .select("pseudo,text,created_at,auteur_auth_id")
         .eq("conversation_id", conversationActuelle)
         .order("created_at", {
             ascending: true
@@ -783,7 +834,7 @@ async function chargerMessagesPrives() {
         return;
     }
 
-    id("messagesPrives").innerHTML = "";
+    id("messagesPrives").replaceChildren();
 
     resultat.data.forEach(message => {
         afficherMessage("messagesPrives", message);
@@ -793,71 +844,67 @@ async function chargerMessagesPrives() {
         id("messagesPrives").scrollHeight;
 }
 
-/* Envoyer un message privé */
-id("formulairePrive").addEventListener(
-    "submit",
-    async event => {
-        event.preventDefault();
+id("formulairePrive").addEventListener("submit", async event => {
+    event.preventDefault();
 
-        const texte = id("textePrive").value.trim();
-
-        if (!texte) {
-            return;
-        }
-
-        if (!conversationActuelle) {
-            afficherErreur(
-                "erreurPrive",
-                "Ouvre d'abord une conversation."
-            );
-            return;
-        }
-
-        const resultat = await base
-            .from("messages_prives")
-            .insert({
-                conversation_id: conversationActuelle,
-                pseudo: pseudo,
-                text: texte
-            });
-
-        if (resultat.error) {
-            afficherErreur(
-                "erreurPrive",
-                resultat.error.message
-            );
-            return;
-        }
-
-        id("textePrive").value = "";
-        afficherErreur("erreurPrive", "");
-
-        await chargerMessagesPrives();
-    }
-);
-
-/* Actualiser automatiquement les messages toutes les 2 secondes */
-setInterval(() => {
-    if (conversationActuelle) {
-        chargerMessagesPrives();
-    }
-}, 2000);
-
-/* GROUPES */
-
-/* Charger la liste des groupes */
-async function chargerGroupes() {
-    const resultat = await base
-        .from("groupes")
-        .select("id,nom,createur")
-        .order("created_at", { ascending: true });
-
-    if (resultat.error) {
-        afficherErreur("erreurGroupe", resultat.error.message);
+    if (!verifierConnexion("erreurPrive")) {
         return;
     }
 
-    id("listeGroupes").innerHTML = "";
+    const texte = id("textePrive").value.trim();
+
+    if (!texte) {
+        return;
+    }
+
+    if (!conversationActuelle) {
+        afficherErreur(
+            "erreurPrive",
+            "Ouvre d'abord une conversation."
+        );
+        return;
+    }
+
+    const resultat = await base
+        .from("messages_prives")
+        .insert({
+            conversation_id: conversationActuelle,
+            pseudo: pseudo,
+            text: texte,
+            auteur_auth_id: utilisateurAuth.id
+        });
+
+    if (resultat.error) {
+        afficherErreur(
+            "erreurPrive",
+            resultat.error.message
+        );
+        return;
+    }
+
+    id("textePrive").value = "";
+    await chargerMessagesPrives();
+});
+
+/* GROUPES */
+
+async function chargerGroupes() {
+    const resultat = await base
+        .from("groupes")
+        .select("id,nom,createur,createur_auth_id")
+        .order("created_at", {
+            ascending: true
+        });
+
+    if (resultat.error) {
+        afficherErreur(
+            "erreurGroupe",
+            resultat.error.message
+        );
+        return;
+    }
+
+    id("listeGroupes").replaceChildren();
 
     resultat.data.forEach(groupe => {
         const bouton = document.createElement("button");
@@ -878,23 +925,32 @@ async function chargerGroupes() {
     });
 }
 
-/* Créer un groupe */
 id("creerGroupe").addEventListener("click", async () => {
+    if (!verifierConnexion("erreurGroupe")) {
+        return;
+    }
+
     const nom = id("nomGroupe").value.trim();
 
-    if (!nom) return;
+    if (!nom) {
+        return;
+    }
 
     const resultat = await base
         .from("groupes")
         .insert({
             nom: nom,
-            createur: pseudo
+            createur: pseudo,
+            createur_auth_id: utilisateurAuth.id
         })
         .select()
         .single();
 
     if (resultat.error) {
-        afficherErreur("erreurGroupe", resultat.error.message);
+        afficherErreur(
+            "erreurGroupe",
+            resultat.error.message
+        );
         return;
     }
 
@@ -902,11 +958,15 @@ id("creerGroupe").addEventListener("click", async () => {
         .from("membres_groupes")
         .insert({
             groupe_id: resultat.data.id,
-            pseudo: pseudo
+            pseudo: pseudo,
+            membre_auth_id: utilisateurAuth.id
         });
 
     if (ajoutMembre.error) {
-        afficherErreur("erreurGroupe", ajoutMembre.error.message);
+        afficherErreur(
+            "erreurGroupe",
+            ajoutMembre.error.message
+        );
         return;
     }
 
@@ -917,34 +977,41 @@ id("creerGroupe").addEventListener("click", async () => {
     await choisirGroupe(resultat.data);
 });
 
-/* Sélectionner un groupe */
 async function choisirGroupe(groupe) {
     groupeActuel = groupe.id;
 
     id("informationGroupe").textContent =
-        "Groupe : " + groupe.nom +
-        " • Créateur : " + groupe.createur;
+        "Groupe : " +
+        groupe.nom +
+        " • Créateur : " +
+        groupe.createur;
 
     await chargerMessagesGroupes();
     await chargerGroupes();
 }
 
-/* Charger les messages du groupe */
 async function chargerMessagesGroupes() {
-    if (!groupeActuel) return;
-
-    const resultat = await base
-        .from("messages_groupes")
-        .select("pseudo,text,created_at")
-        .eq("groupe_id", groupeActuel)
-        .order("created_at", { ascending: true });
-
-    if (resultat.error) {
-        afficherErreur("erreurGroupe", resultat.error.message);
+    if (!groupeActuel) {
         return;
     }
 
-    id("messagesGroupes").innerHTML = "";
+    const resultat = await base
+        .from("messages_groupes")
+        .select("pseudo,text,created_at,auteur_auth_id")
+        .eq("groupe_id", groupeActuel)
+        .order("created_at", {
+            ascending: true
+        });
+
+    if (resultat.error) {
+        afficherErreur(
+            "erreurGroupe",
+            resultat.error.message
+        );
+        return;
+    }
+
+    id("messagesGroupes").replaceChildren();
 
     resultat.data.forEach(message => {
         afficherMessage("messagesGroupes", message);
@@ -954,13 +1021,18 @@ async function chargerMessagesGroupes() {
         id("messagesGroupes").scrollHeight;
 }
 
-/* Envoyer un message dans le groupe sélectionné */
 id("formulaireGroupe").addEventListener("submit", async event => {
     event.preventDefault();
 
+    if (!verifierConnexion("erreurGroupe")) {
+        return;
+    }
+
     const texte = id("texteGroupe").value.trim();
 
-    if (!texte) return;
+    if (!texte) {
+        return;
+    }
 
     if (!groupeActuel) {
         afficherErreur(
@@ -975,50 +1047,120 @@ id("formulaireGroupe").addEventListener("submit", async event => {
         .insert({
             groupe_id: groupeActuel,
             pseudo: pseudo,
-            text: texte
+            text: texte,
+            auteur_auth_id: utilisateurAuth.id
         });
 
     if (resultat.error) {
-        afficherErreur("erreurGroupe", resultat.error.message);
+        afficherErreur(
+            "erreurGroupe",
+            resultat.error.message
+        );
         return;
     }
 
     id("texteGroupe").value = "";
-    afficherErreur("erreurGroupe", "");
-
     await chargerMessagesGroupes();
 });
 
-/* Actualisation automatique toutes les 2 secondes */
+/* CHANGER DE PSEUDO */
+
+id("changerPseudo").addEventListener("click", async () => {
+    if (!verifierConnexion("erreurConnexion")) {
+        return;
+    }
+
+    const nouveauPseudo = prompt(
+        "Nouveau pseudo :",
+        pseudo
+    );
+
+    if (!nouveauPseudo || !nouveauPseudo.trim()) {
+        return;
+    }
+
+    const propre = nouveauPseudo.trim();
+
+    const resultat = await base
+        .from("utilisateurs")
+        .update({
+            pseudo: propre
+        })
+        .eq("auth_id", utilisateurAuth.id);
+
+    if (resultat.error) {
+        alert(resultat.error.message);
+        return;
+    }
+
+    pseudo = propre;
+    actualiserProfil();
+});
+
+/* BOUTONS DE CONNEXION */
+
+id("boutonInscription").addEventListener(
+    "click",
+    inscrireCompte
+);
+
+id("boutonConnexion").addEventListener(
+    "click",
+    connecterCompte
+);
+
+id("motDePasseInput").addEventListener(
+    "keydown",
+    event => {
+        if (event.key === "Enter") {
+            connecterCompte();
+        }
+    }
+);
+
+/* DÉMARRAGE */
+
+async function demarrerMiniChat() {
+    const session = await base.auth.getSession();
+
+    if (!session.data.session) {
+        id("connexion").style.display = "flex";
+        return;
+    }
+
+    const profil = await base
+        .from("utilisateurs")
+        .select("pseudo,auth_id")
+        .eq("auth_id", session.data.session.user.id)
+        .single();
+
+    if (profil.error || !profil.data) {
+        id("connexion").style.display = "flex";
+        return;
+    }
+
+    utilisateurAuth = session.data.session.user;
+    pseudo = profil.data.pseudo;
+
+    id("connexion").style.display = "none";
+
+    actualiserProfil();
+
+    await chargerMessagesPublics();
+    await chargerGroupes();
+}
+
 setInterval(() => {
+    if (conversationActuelle) {
+        chargerMessagesPrives();
+    }
+
     if (groupeActuel) {
         chargerMessagesGroupes();
     }
 }, 2000);
 
-/* CHANGER DE PSEUDO */
-
-id("changerPseudo").addEventListener("click", () => {
-    localStorage.removeItem("minichat_pseudo");
-    location.reload();
-});
-
-id("boutonConnexion").addEventListener("click", connecterPseudo);
-
-id("pseudoInput").addEventListener("keydown", event => {
-    if (event.key === "Enter") {
-        connecterPseudo();
-    }
-});
-
-/* DÉMARRAGE */
-
-if (pseudo) {
-    id("connexion").style.display = "none";
-    actualiserProfil();
-    chargerMessagesPublics();
-    chargerGroupes();
-}
+demarrerMiniChat();
 </script>
 
 </body>
