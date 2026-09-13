@@ -251,23 +251,16 @@ button:hover{
 
 <body>
 
-<!-- CONNEXION SANS MOT DE PASSE -->
+<!-- CONNEXION SANS EMAIL NI MOT DE PASSE -->
 
 <div id="connexion">
     <div class="boite-connexion">
         <h2>💬 Bienvenue sur MiniChat</h2>
 
         <p>
-            Entre ton adresse e-mail et ton pseudo.
-            Tu recevras un lien de connexion.
+            Choisis un pseudo pour entrer dans MiniChat.
+            Aucun e-mail ni mot de passe n'est nécessaire.
         </p>
-
-        <input
-            type="email"
-            id="emailInput"
-            placeholder="Ton adresse e-mail"
-            style="width:100%;margin-top:10px"
-        >
 
         <input
             type="text"
@@ -281,7 +274,7 @@ button:hover{
             id="boutonConnexion"
             style="width:100%;margin-top:10px"
         >
-            Recevoir le lien de connexion
+            Entrer dans MiniChat
         </button>
 
         <div id="erreurConnexion" class="erreur"></div>
@@ -322,7 +315,6 @@ button:hover{
         <!-- DISCUSSION PUBLIQUE -->
 
         <section id="public" class="page actif">
-
             <div id="messagesPublics" class="messages"></div>
 
             <form id="formulairePublic">
@@ -331,7 +323,6 @@ button:hover{
                     maxlength="500"
                     placeholder="Écris un message public..."
                 >
-
                 <button>Envoyer</button>
             </form>
 
@@ -503,17 +494,14 @@ document.querySelectorAll(".navigation").forEach(bouton => {
         });
 
         document.querySelectorAll(".navigation").forEach(b => {
-            b.classList.toggle(
-                "actif",
-                b === bouton
-            );
+            b.classList.toggle("actif", b === bouton);
         });
 
         const titres = {
-            public: "Discussion publique",
-            prive: "Messages privés",
-            groupes: "Groupes",
-            profil: "Mon profil"
+            public:"Discussion publique",
+            prive:"Messages privés",
+            groupes:"Groupes",
+            profil:"Mon profil"
         };
 
         id("titrePage").textContent = titres[page];
@@ -564,19 +552,18 @@ function afficherMessage(element, message){
     id(element).appendChild(bloc);
 }
 
-/* CONNEXION SANS MOT DE PASSE */
+/* CONNEXION AVEC PSEUDO UNIQUEMENT */
 
 async function connecterCompte(){
 
-    const email = id("emailInput").value.trim();
     const nouveauPseudo = id("pseudoInput").value.trim();
 
     afficherErreur("erreurConnexion");
 
-    if(!email || !nouveauPseudo){
+    if(!nouveauPseudo){
         afficherErreur(
             "erreurConnexion",
-            "Entre ton adresse e-mail et ton pseudo."
+            "Entre un pseudo."
         );
 
         return;
@@ -591,82 +578,68 @@ async function connecterCompte(){
         return;
     }
 
-    localStorage.setItem(
-        "pseudoEnAttente",
-        nouveauPseudo
-    );
-
-    const resultat = await base.auth.signInWithOtp({
-        email: email,
-
-        options: {
-            emailRedirectTo: window.location.href
-        }
-    });
-
-    if(resultat.error){
+    if(nouveauPseudo.length > 25){
         afficherErreur(
             "erreurConnexion",
-            resultat.error.message
+            "Ton pseudo ne doit pas dépasser 25 caractères."
         );
 
         return;
     }
 
-    afficherSucces(
-        "erreurConnexion",
-        "Un lien de connexion vient d'être envoyé à ton adresse e-mail."
-    );
-}
+    const bouton = id("boutonConnexion");
 
-/* CHARGER LE PROFIL APRÈS CONNEXION */
+    bouton.disabled = true;
+    bouton.textContent = "Connexion...";
 
-async function chargerProfilApresConnexion(){
+    const resultat = await base.auth.signInAnonymously();
 
-    if(!utilisateurAuth){
-        return false;
+    if(resultat.error){
+
+        afficherErreur(
+            "erreurConnexion",
+            "Erreur de connexion : " +
+            resultat.error.message
+        );
+
+        bouton.disabled = false;
+        bouton.textContent = "Entrer dans MiniChat";
+
+        return;
     }
 
-    let profil = await base
+    utilisateurAuth = resultat.data.user;
+
+    const profilExistant = await base
         .from("utilisateurs")
         .select("pseudo,auth_id")
         .eq("auth_id", utilisateurAuth.id)
         .maybeSingle();
 
-    if(profil.error){
+    if(profilExistant.error){
+
         afficherErreur(
             "erreurConnexion",
-            profil.error.message
+            profilExistant.error.message
         );
 
-        return false;
+        bouton.disabled = false;
+        bouton.textContent = "Entrer dans MiniChat";
+
+        return;
     }
 
-    /*
-       Si aucun profil n'existe encore,
-       on utilise le pseudo enregistré avant l'envoi du lien.
-    */
+    if(profilExistant.data){
 
-    if(!profil.data){
+        pseudo = profilExistant.data.pseudo;
 
-        const pseudoEnAttente =
-            localStorage.getItem("pseudoEnAttente");
-
-        if(!pseudoEnAttente){
-
-            afficherErreur(
-                "erreurConnexion",
-                "Aucun pseudo trouvé. Recommence la connexion."
-            );
-
-            return false;
-        }
+    }else{
 
         const creationProfil = await base
             .from("utilisateurs")
             .insert({
-                pseudo: pseudoEnAttente,
-                auth_id: utilisateurAuth.id
+                pseudo:nouveauPseudo,
+                auth_id:utilisateurAuth.id
             })
             .select("pseudo,auth_id")
             .single();
@@ -679,27 +652,24 @@ async function chargerProfilApresConnexion(){
                 creationProfil.error.message
             );
 
-            return false;
+            bouton.disabled = false;
+            bouton.textContent = "Entrer dans MiniChat";
+
+            return;
         }
 
-        profil = creationProfil;
-
-        localStorage.removeItem("pseudoEnAttente");
+        pseudo = creationProfil.data.pseudo;
     }
 
-    if(profil.error || !profil.data){
+    id("connexion").style.display = "none";
 
-        afficherErreur(
-            "erreurConnexion",
-            "Profil MiniChat introuvable."
-        );
+    bouton.disabled = false;
+    bouton.textContent = "Entrer dans MiniChat";
 
-        return false;
-    }
+    actualiserProfil();
 
-    pseudo = profil.data.pseudo;
-
-    return true;
+    await chargerMessagesPublics();
+    await chargerGroupes();
 }
 
 /* MESSAGES PUBLICS */
@@ -733,10 +703,7 @@ async function chargerMessagesPublics(){
     zone.replaceChildren();
 
     resultat.data.forEach(message => {
-        afficherMessage(
-            "messagesPublics",
-            message
-        );
+        afficherMessage("messagesPublics", message);
     });
 
     if(etaitEnBas){
@@ -941,11 +908,7 @@ async function chargerMessagesPrives(){
     id("messagesPrives").replaceChildren();
 
     resultat.data.forEach(message => {
-
-        afficherMessage(
-            "messagesPrives",
-            message
-        );
+        afficherMessage("messagesPrives", message);
     });
 
     id("messagesPrives").scrollTop =
@@ -1104,7 +1067,6 @@ id("creerGroupe").addEventListener(
         groupeActuel = resultat.data.id;
 
         await chargerGroupes();
-
         await choisirGroupe(resultat.data);
     }
 );
@@ -1120,7 +1082,6 @@ async function choisirGroupe(groupe){
         groupe.createur;
 
     await chargerMessagesGroupes();
-
     await chargerGroupes();
 }
 
@@ -1151,11 +1112,7 @@ async function chargerMessagesGroupes(){
     id("messagesGroupes").replaceChildren();
 
     resultat.data.forEach(message => {
-
-        afficherMessage(
-            "messagesGroupes",
-            message
-        );
+        afficherMessage("messagesGroupes", message);
     });
 
     id("messagesGroupes").scrollTop =
@@ -1228,14 +1185,16 @@ id("changerPseudo").addEventListener(
             pseudo
         );
 
-        if(
-            !nouveauPseudo ||
-            !nouveauPseudo.trim()
-        ){
+        if(!nouveauPseudo || !nouveauPseudo.trim()){
             return;
         }
 
         const propre = nouveauPseudo.trim();
+
+        if(propre.length < 2 || propre.length > 25){
+            alert("Le pseudo doit contenir entre 2 et 25 caractères.");
+            return;
+        }
 
         const resultat = await base
             .from("utilisateurs")
@@ -1247,12 +1206,10 @@ id("changerPseudo").addEventListener(
         if(resultat.error){
 
             alert(resultat.error.message);
-
             return;
         }
 
         pseudo = propre;
-
         actualiserProfil();
     }
 );
@@ -1270,86 +1227,49 @@ async function demarrerMiniChat(){
     if(!session){
 
         id("connexion").style.display = "flex";
-
         return;
     }
 
     utilisateurAuth = session.user;
 
-    const profilCorrect =
-        await chargerProfilApresConnexion();
+    const profil = await base
+        .from("utilisateurs")
+        .select("pseudo,auth_id")
+        .eq("auth_id",utilisateurAuth.id)
+        .maybeSingle();
 
-    if(!profilCorrect){
+    if(profil.error){
+
+        afficherErreur(
+            "erreurConnexion",
+            profil.error.message
+        );
 
         id("connexion").style.display = "flex";
-
         return;
     }
+
+    if(!profil.data){
+
+        id("connexion").style.display = "flex";
+        return;
+    }
+
+    pseudo = profil.data.pseudo;
 
     id("connexion").style.display = "none";
 
     actualiserProfil();
 
     await chargerMessagesPublics();
-
     await chargerGroupes();
 }
-
-/* ÉCOUTER LES CHANGEMENTS DE CONNEXION */
-
-base.auth.onAuthStateChange(
-    async (event, session) => {
-
-        if(
-            event === "SIGNED_IN" &&
-            session
-        ){
-
-            utilisateurAuth = session.user;
-
-            const profilCorrect =
-                await chargerProfilApresConnexion();
-
-            if(profilCorrect){
-
-                id("connexion").style.display = "none";
-
-                actualiserProfil();
-
-                await chargerMessagesPublics();
-
-                await chargerGroupes();
-            }
-        }
-
-        if(event === "SIGNED_OUT"){
-
-            utilisateurAuth = null;
-            pseudo = "";
-            conversationActuelle = null;
-            destinataireActuel = "";
-            groupeActuel = null;
-
-            id("connexion").style.display = "flex";
-        }
-    }
-);
 
 /* BOUTON DE CONNEXION */
 
 id("boutonConnexion").addEventListener(
     "click",
     connecterCompte
-);
-
-id("emailInput").addEventListener(
-    "keydown",
-    event => {
-
-        if(event.key === "Enter"){
-            connecterCompte();
-        }
-    }
 );
 
 id("pseudoInput").addEventListener(
@@ -1365,6 +1285,10 @@ id("pseudoInput").addEventListener(
 /* ACTUALISATION AUTOMATIQUE */
 
 setInterval(() => {
+
+    if(!utilisateurAuth){
+        return;
+    }
 
     if(conversationActuelle){
         chargerMessagesPrives();
